@@ -1,4 +1,3 @@
----
 _extends: gh-labels
 
 repository:
@@ -49,4 +48,3 @@ branches:
           - ci
           - employees
 
-...
