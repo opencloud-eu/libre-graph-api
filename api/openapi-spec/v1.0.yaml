@@ -135,6 +135,71 @@ paths:
                             name: "secret stuff"
         default:
           $ref: '#/components/responses/error'
+  '/v1beta1/extensions/org.libregraph/appTokens':
+    get:
+      tags:
+        - appTokens
+      summary: Get app tokens
+      operationId: GetAppTokens
+      responses:
+        '200':
+          description: Found app tokens
+          content:
+            application/json:
+              schema:
+                title: Collection of app tokens
+                type: object
+                properties:
+                  value:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/appToken'
+        default:
+          $ref: '#/components/responses/error'
+    post:
+      tags:
+        - appTokens
+      summary: Create app token
+      operationId: CreateAppToken
+      requestBody:
+        description: New app token values
+        content:
+          application/json:
+            schema:
+              title: App token params
+              type: object
+              properties:
+                expirationDateTime:
+                  type: string
+                  description: Optional. Expiration of the new token. Defaults to now+72h.
+                  required: false
+        required: false
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/appToken'
+        default:
+          $ref: '#/components/responses/error'
+    delete:
+      tags:
+        - appTokens
+      summary: Delete an app token
+      operationId: DeleteAppToken
+      parameters:
+        - name: token
+          in: path
+          description: 'key: token'
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Success
+        default:
+          $ref: '#/components/responses/error'
   '/v1beta1/me/drives':
     # $ref is buggy in the openapi-generator v7.0.1
     # $ref: '#/paths/~1v1.0~1me~1drives'
@@ -4437,6 +4502,28 @@ components:
             variables:
               type: object
               description: Activity description variables.
+    appToken:
+      description: Represents an app token.
+      type: object
+      required:
+        - token
+        - createdDateTime
+        - expirationDateTime
+      properties:
+        token:
+          type: string
+          description: The token itself
+        createdDateTime:
+          type: string
+          description: A String with format of yyyy-MM-ddTHH:mm:ssZ of DateTime indicates the creation time of the app token.
+          format: date-time
+        expirationDateTime:
+          type: string
+          description: A String with format of yyyy-MM-ddTHH:mm:ssZ of DateTime indicates the expiration time of the app token.
+          format: date-time
+        label:
+          type: string
+          description: Optional. Additional information for the app token, like created via API, CLI or impersonation.
     driveItem:
       description: Represents a resource inside a drive. Read-only.
       readOnly: true
