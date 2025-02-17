@@ -1,7 +1,7 @@
 _extends: gh-labels
 
 repository:
-  name: open-graph-api
-  description: ':cloud: Open Graph Cloud Collaboration API'
+  name: libre-graph-api
+  description: ':cloud: Libre Graph Cloud Collaboration API'
   topics: api, graph
 
