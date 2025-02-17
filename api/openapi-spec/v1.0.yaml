@@ -7,16 +7,8 @@ info:
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
 servers:
-  - url: https://ocis.ocis.rolling.owncloud.works/graph
-    description: ownCloud Infinite Scale Rolling Release
   - url: https://localhost:9200/graph
-    description: ownCloud Infinite Scale Development Setup
-# commented for now because it is unrelated to the PR but allows describing and linking to external docs
-# tags:
-#  - name: roleManagement
-#    description: Manage roles and permissions
-#    externalDocs:
-#      url: https://owncloud.dev/ocis/roles-and-permissions
+    description: OpenCloud Development Setup
 paths:
   '/v1.0/me':
     patch:
@@ -2368,7 +2360,7 @@ paths:
                 value:
                   - id: 78363031-03ef-4eda-84a2-243a691a13cd
                     createdDateTime: "2020-02-19T14:23:25.52Z"
-                    # not yet supported by ocis
+                    # not yet supported by opencloud
                     #cTag: "adDpDMTI2NDRBMTRCMEE3NzUwITEzNzkuNjM3NjYyNzQ5NjU1MDMwMDAw"
                     eTag: "aQzEyNjQ0QTE0QjBBNzc1MCExMzc5LjQ"
                     lastModifiedDateTime: "2021-09-03T14:09:25.503Z"
@@ -4056,7 +4048,7 @@ components:
             $ref: '#/components/schemas/objectIdentity'
         mail:
           type: string
-          description: 'The SMTP address for the user, for example, ''jeff@contoso.onowncloud.com''. Returned by default.'
+          description: 'The SMTP address for the user, for example, ''jeff@contoso.opencloud.com''. Returned by default.'
         memberOf:
           type: array
           items:
@@ -4352,7 +4344,7 @@ components:
             $ref: '#/components/schemas/objectIdentity'
         mail:
           type: string
-          description: 'The SMTP address for the user, for example, ''jeff@contoso.onowncloud.com''. Returned by default.'
+          description: 'The SMTP address for the user, for example, ''jeff@contoso.opencloud.com''. Returned by default.'
         memberOf:
           type: array
           items:
@@ -4612,12 +4604,12 @@ components:
         #  type: string
         #  description: Optional. The scope of link to create. Either `anonymous`, `organization`, or `users`.
 
-        # unused. In ocis recipients configure if they want to be notified
+        # unused. In opencloud recipients configure if they want to be notified
         #sendNotification:
         #  type: boolean
         #  description: Optional. If `true`, this method sends a sharing link in an email to users specified in recipients. The default value is `false`. Optional.
 
-        # unused. not supported by ocis
+        # unused. not supported by opencloud
         #retainInheritedPermissions:
         #  type: boolean
         #  description: Optional. If `true` (default), any existing inherited permissions are retained on the shared item when sharing this item for the first time. If `false`, all existing permissions are removed when sharing for the first time.
@@ -4655,7 +4647,7 @@ components:
         #  type: boolean
         #  description: Specifies whether the recipient of the invitation is required to sign-in to view the shared item.
 
-        # In ocis recipients configure if they want to be notified
+        # In opencloud recipients configure if they want to be notified
         #sendInvitation:
         #  type: boolean
         #  description: If `true`, a sharing link is sent to the recipient. Otherwise, a permission is granted directly without sending a notification.
@@ -4665,7 +4657,7 @@ components:
         #  type: string
         #  description: The password set on the invite by the creator. Optional.
 
-        # not supported by ocis
+        # not supported by opencloud
         #retainInheritedPermissions:
         #  type: boolean
         #  description: Optional. If `true` (default), any existing inherited permissions are retained on the shared item when sharing this item for the first time. If `false`, all existing permissions are removed when sharing for the first time.
@@ -5635,7 +5627,7 @@ components:
   securitySchemes:
     openId:
       type: openIdConnect
-      openIdConnectUrl: https://ocis.ocis.rolling.owncloud.works/.well-known/openid-configuration
+      openIdConnectUrl: https://cloud.rolling.opencloud.rocks/.well-known/openid-configuration
     bearerAuth:
       type: http
       scheme: bearer

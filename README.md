@@ -37,7 +37,7 @@ An OpenAPI definition can then be used by documentation generation tools to disp
 
 ## Documentation
 
-You can find a rendered version of the [API documentation](https://owncloud.dev/libre-graph-api/) in our dev docs.
+You can find a rendered version of the [API documentation](https://opencloud-eu.github.io/libre-graph-api/) in our dev docs.
 
 ## Clients
 
@@ -51,8 +51,8 @@ That generates the output in out/cpp.
 
 
 ### Available client libraries
-- [C++/Qt](https://github.com/owncloud/libre-graph-api-cpp-qt-client)
-- [go](https://github.com/owncloud/libre-graph-api-go)
-- [php](https://github.com/owncloud/libre-graph-api-php)
-- [typescript-axios](https://github.com/owncloud/libre-graph-api-typescript-axios)
+- [C++/Qt](https://github.com/opencloud-eu/libre-graph-api-cpp-qt-client)
+- [go](https://github.com/opencloud-eu/libre-graph-api-go)
+- [php](https://github.com/opencloud-eu/libre-graph-api-php)
+- [typescript-axios](https://github.com/opencloud-eu/libre-graph-api-typescript-axios)
 
