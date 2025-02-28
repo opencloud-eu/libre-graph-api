@@ -36,7 +36,7 @@ steps:
       - apt-get update
       - apt-get install -y openssh-client rsync
       - mkdir -p $HOME/.ssh
-      - ssh-keyscan -vvv -t rsa $REMOTE_HOST >> $HOME/.ssh/known_hosts
+      - ssh-keyscan -t rsa $REMOTE_HOST >> $HOME/.ssh/known_hosts
       - echo "$SSH_KEY" > "$HOME/.ssh/id_rsa"
       - chmod 0600 $HOME/.ssh/id_rsa
       - rsync -a --exclude '.git' --delete . woodpeckersyncer@$REMOTE_HOST:/var/swagger/libre-graph-api
