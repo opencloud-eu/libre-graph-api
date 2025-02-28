@@ -9,6 +9,8 @@ info:
 servers:
   - url: https://localhost:9200/graph
     description: OpenCloud Development Setup
+  - url: https://cloud.example.test/graph
+    description: OpenCloud Example Setup
 paths:
   '/v1.0/me':
     patch:
