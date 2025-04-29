@@ -1,0 +1,46 @@
+---
+variables:
+  - &generator_image 'openapitools/openapi-generator-cli:v7.8.0@sha256:18345ed78d64e2590481c6c4ed1d15e8a389156a38a289ba2960b0693ea69207'
+  - &environment
+    HTTP_PROXY:
+      from_secret: ci_http_proxy
+    HTTPS_PROXY:
+      from_secret: ci_http_proxy
+
+when:
+  - event: [ push , manual ]
+    branch: main
+
+steps:
+  clone_target_repo:
+    image: woodpeckerci/plugin-git
+    settings:
+      branch: main
+      path: libre-graph-api-go
+      repo: opencloud-eu/libre-graph-api-go
+  generate-go:
+    image: *generator_image
+    environment: *environment
+    commands:
+      - '/usr/local/bin/docker-entrypoint.sh generate
+        --enable-post-process-file
+        -i api/openapi-spec/v1.0.yaml
+        --additional-properties=packageName=libregraph
+        --git-user-id=opencloud-eu
+        --git-repo-id=libre-graph-api-go
+        -g go
+        -o libre-graph-api-go
+        --api-name-suffix Api'
+  push_target_repo:
+    image: appleboy/drone-git-push
+    settings:
+      path: libre-graph-api-go
+      remote: git@github.com:opencloud-eu/libre-graph-api-go.git
+      branch: main
+      ssh_key:
+        from_secret: push_remote_deploy_key
+      followtags: true
+      commit: true
+      commit_message: $CI_COMMIT_MESSAGE
+      author_name: $CI_COMMIT_AUTHOR
+      author_email: $CI_COMMIT_AUTHOR_EMAIL
