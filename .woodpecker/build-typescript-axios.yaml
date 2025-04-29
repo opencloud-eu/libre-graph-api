@@ -1,0 +1,60 @@
+---
+variables:
+  - &alpine_image 'owncloudci/alpine:latest'
+  - &generator_image 'openapitools/openapi-generator-cli:v7.13.0@sha256:52b4b2bb6129b086b0f12614e98c884d378a84349fa114b07e20515702a793c5'
+  - &environment
+    HTTP_PROXY:
+      from_secret: ci_http_proxy
+    HTTPS_PROXY:
+      from_secret: ci_http_proxy
+
+when:
+  - event: [ push , manual ]
+    branch: main
+
+steps:
+  clone_target_repo:
+    image: woodpeckerci/plugin-git
+    settings:
+      branch: main
+      ref: HEAD
+      path: libre-graph-api-typescript-axios
+      remote: https://github.com/opencloud-eu/libre-graph-api-typescript-axios.git
+  generate-typescript-axios:
+    image: *generator_image
+    environment: *environment
+    commands:
+      - rm -Rf libre-graph-api-typescript-axios/*
+      - '/usr/local/bin/docker-entrypoint.sh generate
+        --enable-post-process-file
+        -i api/openapi-spec/v1.0.yaml
+        --additional-properties=packageName=libregraph
+        --git-user-id=opencloud-eu
+        --git-repo-id=libre-graph-api-typescript-axios
+        -g typescript-axios
+        -o libre-graph-api-typescript-axios
+        --api-name-suffix Api'
+      - cp LICENSE libre-graph-api-typescript-axios/LICENSE
+  diff:
+    image: *alpine_image
+    environment: *environment
+    commands:
+      - cd libre-graph-api-typescript-axios
+      - git diff
+  push_target_repo:
+    image: quay.io/thegeeklab/wp-git-action
+    settings:
+      path: libre-graph-api-typescript-axios
+      remote_url: https://github.com/opencloud-eu/libre-graph-api-go.git
+      branch: main
+      action:
+        - commit
+        - push
+      followtags: true
+      message: ${CI_COMMIT_MESSAGE}
+      author_name: ${CI_COMMIT_AUTHOR}
+      author_email: ${CI_COMMIT_AUTHOR_EMAIL}
+      netrc_password:
+        from_secret: github_token
+      netrc_username:
+        from_secret: github_username
