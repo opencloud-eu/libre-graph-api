@@ -17,7 +17,10 @@ steps:
     settings:
       branch: main
       path: libre-graph-api-go
-      repo: opencloud-eu/libre-graph-api-go
+      remote-ssh: git@github.com:opencloud-eu/libre-graph-api-go.git
+      use-ssh: true
+      ssh_key:
+        from_secret: push_remote_deploy_key
   generate-go:
     image: *generator_image
     environment: *environment
