@@ -111,7 +111,24 @@ paths:
       tags:
         - me.photo
       summary: Update the current user's profile photo
-      operationId: UpdateOwnUserPhoto
+      operationId: UpdateOwnUserPhotoPut
+      requestBody:
+        description: New user photo
+        content:
+          image/png:
+            schema:
+              type: string
+              format: binary
+      responses:
+        '204':
+          description: Success
+        default:
+          $ref: '#/components/responses/error'
+    patch:
+      tags:
+        - me.photo
+      summary: Update the current user's profile photo
+      operationId: UpdateOwnUserPhotoPatch
       requestBody:
         description: New user photo
         content:
