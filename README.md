@@ -37,7 +37,7 @@ An OpenAPI definition can then be used by documentation generation tools to disp
 
 ## Documentation
 
-You can find a rendered version of the [API documentation](https://opencloud-eu.github.io/libre-graph-api/) in our dev docs.
+You can find a rendered version of the [API documentation](https://docs.opencloud.eu/swagger/libre-graph-api/) in our dev docs.
 
 ## Clients
 
