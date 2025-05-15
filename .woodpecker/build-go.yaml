@@ -42,6 +42,14 @@ steps:
     commands:
       - cd libre-graph-api-go
       - git diff
+  git-tag:
+    image: *alpine_image
+    environment: *environment
+    commands:
+      - cd libre-graph-api-go
+      - git tag -a ${CI_COMMIT_TAG} -m ${CI_COMMIT_MESSAGE}
+    when:
+      - event: tag 
   push_target_repo:
     image: quay.io/thegeeklab/wp-git-action
     settings:
