@@ -9,8 +9,9 @@ variables:
       from_secret: ci_http_proxy
 
 when:
-  - event: [ push , manual ]
+  - event: [ push, manual ]
     branch: main
+  - event: [ pull_request, tag ]
 
 steps:
   clone_target_repo:
@@ -58,3 +59,7 @@ steps:
         from_secret: github_token
       netrc_username:
         from_secret: github_username
+    when:
+      - event: [ push , manual ]
+        branch: main
+      - event: tag 
