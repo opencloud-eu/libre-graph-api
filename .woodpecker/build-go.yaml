@@ -47,6 +47,8 @@ steps:
     environment: *environment
     commands:
       - cd libre-graph-api-go
+      - git config user.email devops@opencloud.eu
+      - git config user.name "OpenCloud Devops"
       - git tag -a ${CI_COMMIT_TAG} -m "release $CI_COMMIT_TAG"
     when:
       - event: tag
