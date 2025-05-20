@@ -91,35 +91,6 @@ paths:
         default:
           $ref: '#/components/responses/error'
       x-ms-docs-operation-type: operation
-  /v1.0/me/photo:
-    get:
-      tags:
-        - me.photo
-      summary: Get the current user's profile photo metadata
-      operationId: GetOwnUserPhotoMetadata
-      responses:
-        '200':
-          description: Retrieve photo metadata
-          content:
-            application/json:
-              schema:
-                title: Collection of educationUser
-                type: object
-                properties:
-                  value:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/profilePhotoMetaData'
-              example:
-                - id: "240x240"
-                  width: 240
-                  height: 240
-                  '@odata.type': '#microsoft.graph.profilePhotoMetaData'
-                  '@odata.id': "https://graph.microsoft.com/v1.0/users('ddfcd489-628b-7d04-b48b-20075df800e5@1717622f-1d94-c0d4-9d74-f907ad6677b4')/photo"
-                  '@odata.mediaContentType': "image/jpeg"
-                  '@odata.mediaEtag': "\"BA09D118\""
-        default:
-          $ref: '#/components/responses/error'
   /v1.0/me/photo/$value:
     get:
       tags:
@@ -2883,43 +2854,6 @@ paths:
         style: simple
         schema:
           type: string
-  '/v1.0/users/{user-id}/photo':
-    get:
-      tags:
-        - user.photo
-      summary: Get the photo metadata of a user
-      operationId: GetUserPhotoMetadata
-      parameters:
-        - name: user-id
-          in: path
-          description: 'key: id or name of user'
-          required: true
-          schema:
-            type: string
-          x-ms-docs-key-type: user
-      responses:
-        '200':
-          description: Retrieve photo metadata
-          content:
-            application/json:
-              schema:
-                title: Collection of ProfilePhotoMetaData
-                type: object
-                properties:
-                  value:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/profilePhotoMetaData'
-              example:
-                - id: "240x240"
-                  width: 240
-                  height: 240
-                  '@odata.type': '#microsoft.graph.profilePhotoMetaData'
-                  '@odata.id': "https://graph.microsoft.com/v1.0/users('ddfcd489-628b-7d04-b48b-20075df800e5@1717622f-1d94-c0d4-9d74-f907ad6677b4')/photo"
-                  '@odata.mediaContentType': "image/jpeg"
-                  '@odata.mediaEtag': "\"BA09D118\""
-        default:
-          $ref: '#/components/responses/error'
   '/v1.0/users/{user-id}/photo/$value':
     get:
       tags:
