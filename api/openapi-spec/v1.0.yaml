@@ -95,13 +95,42 @@ paths:
     get:
       tags:
         - me.photo
+      summary: Get the current user's profile photo metadata
+      operationId: GetOwnUserPhotoMetadata
+      responses:
+        '200':
+          description: Retrieve photo metadata
+          content:
+            application/json:
+              schema:
+                title: Collection of educationUser
+                type: object
+                properties:
+                  value:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/profilePhotoMetaData'
+              example:
+                - id: "240x240"
+                  width: 240
+                  height: 240
+                  '@odata.type': '#microsoft.graph.profilePhotoMetaData'
+                  '@odata.id': "https://graph.microsoft.com/v1.0/users('ddfcd489-628b-7d04-b48b-20075df800e5@1717622f-1d94-c0d4-9d74-f907ad6677b4')/photo"
+                  '@odata.mediaContentType': "image/jpeg"
+                  '@odata.mediaEtag': "\"BA09D118\""
+        default:
+          $ref: '#/components/responses/error'
+  /v1.0/me/photo/$value:
+    get:
+      tags:
+        - me.photo
       summary: Get the current user's profile photo
       operationId: GetOwnUserPhoto
       responses:
         '200':
-          description: Retrieved entity
+          description: Retrieved profile photo
           content:
-            image/png:
+            image/jpeg:
               schema:
                 type: string
                 format: binary
@@ -115,7 +144,7 @@ paths:
       requestBody:
         description: New user photo
         content:
-          image/png:
+          image/jpeg:
             schema:
               type: string
               format: binary
@@ -132,7 +161,7 @@ paths:
       requestBody:
         description: New user photo
         content:
-          image/png:
+          image/jpeg:
             schema:
               type: string
               format: binary
@@ -141,6 +170,16 @@ paths:
           description: Success
         default:
           $ref: '#/components/responses/error'
+    delete: 
+        tags:
+          - me.photo
+        summary: Delete the current user's profile photo
+        operationId: DeleteOwnUserPhoto
+        responses:
+          '204':
+            description: Success
+          default:
+            $ref: '#/components/responses/error'
   '/v1beta1/extensions/org.libregraph/activities':
     get:
       tags:
@@ -2848,6 +2887,43 @@ paths:
     get:
       tags:
         - user.photo
+      summary: Get the photo metadata of a user
+      operationId: GetUserPhotoMetadata
+      parameters:
+        - name: user-id
+          in: path
+          description: 'key: id or name of user'
+          required: true
+          schema:
+            type: string
+          x-ms-docs-key-type: user
+      responses:
+        '200':
+          description: Retrieve photo metadata
+          content:
+            application/json:
+              schema:
+                title: Collection of ProfilePhotoMetaData
+                type: object
+                properties:
+                  value:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/profilePhotoMetaData'
+              example:
+                - id: "240x240"
+                  width: 240
+                  height: 240
+                  '@odata.type': '#microsoft.graph.profilePhotoMetaData'
+                  '@odata.id': "https://graph.microsoft.com/v1.0/users('ddfcd489-628b-7d04-b48b-20075df800e5@1717622f-1d94-c0d4-9d74-f907ad6677b4')/photo"
+                  '@odata.mediaContentType': "image/jpeg"
+                  '@odata.mediaEtag': "\"BA09D118\""
+        default:
+          $ref: '#/components/responses/error'
+  '/v1.0/users/{user-id}/photo/$value':
+    get:
+      tags:
+        - user.photo
       summary: Get the photo of a user
       operationId: GetUserPhoto
       parameters:
@@ -4006,6 +4082,31 @@ paths:
           $ref: '#/components/responses/error'
 components:
   schemas:
+    profilePhotoMetaData:
+      type: object
+      properties:
+        "@odata.context":
+          type: string
+          description: The OData context URL for the resource.
+        "@odata.id":
+          type: string
+          description: The OData ID URL for the resource.
+        "@odata.mediaContentType":
+          type: string
+          description: The media content type of the resource.
+        "@odata.mediaEtag":
+          type: string
+          description: The ETag for the resource.
+        id:
+          type: string
+          description: The unique identifier for an entity. Read-only.
+          readOnly: true
+        width:
+          type: integer
+          description: The width of the photo in pixels.
+        height:
+          type: integer
+          description: The height of the photo in pixels.
     tagAssignment:
       type: object
       required:
