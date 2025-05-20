@@ -4016,31 +4016,6 @@ paths:
           $ref: '#/components/responses/error'
 components:
   schemas:
-    profilePhotoMetaData:
-      type: object
-      properties:
-        "@odata.context":
-          type: string
-          description: The OData context URL for the resource.
-        "@odata.id":
-          type: string
-          description: The OData ID URL for the resource.
-        "@odata.mediaContentType":
-          type: string
-          description: The media content type of the resource.
-        "@odata.mediaEtag":
-          type: string
-          description: The ETag for the resource.
-        id:
-          type: string
-          description: The unique identifier for an entity. Read-only.
-          readOnly: true
-        width:
-          type: integer
-          description: The width of the photo in pixels.
-        height:
-          type: integer
-          description: The height of the photo in pixels.
     tagAssignment:
       type: object
       required:
