@@ -91,6 +91,66 @@ paths:
         default:
           $ref: '#/components/responses/error'
       x-ms-docs-operation-type: operation
+  /v1.0/me/photo/$value:
+    get:
+      tags:
+        - me.photo
+      summary: Get the current user's profile photo
+      operationId: GetOwnUserPhoto
+      responses:
+        '200':
+          description: Retrieved profile photo
+          content:
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+        default:
+          $ref: '#/components/responses/error'
+    put:
+      tags:
+        - me.photo
+      summary: Update the current user's profile photo
+      operationId: UpdateOwnUserPhotoPut
+      requestBody:
+        description: New user photo
+        content:
+          image/jpeg:
+            schema:
+              type: string
+              format: binary
+      responses:
+        '204':
+          description: Success
+        default:
+          $ref: '#/components/responses/error'
+    patch:
+      tags:
+        - me.photo
+      summary: Update the current user's profile photo
+      operationId: UpdateOwnUserPhotoPatch
+      requestBody:
+        description: New user photo
+        content:
+          image/jpeg:
+            schema:
+              type: string
+              format: binary
+      responses:
+        '204':
+          description: Success
+        default:
+          $ref: '#/components/responses/error'
+    delete: 
+        tags:
+          - me.photo
+        summary: Delete the current user's profile photo
+        operationId: DeleteOwnUserPhoto
+        responses:
+          '204':
+            description: Success
+          default:
+            $ref: '#/components/responses/error'
   '/v1beta1/extensions/org.libregraph/activities':
     get:
       tags:
@@ -2794,6 +2854,30 @@ paths:
         style: simple
         schema:
           type: string
+  '/v1.0/users/{user-id}/photo/$value':
+    get:
+      tags:
+        - user.photo
+      summary: Get the photo of a user
+      operationId: GetUserPhoto
+      parameters:
+        - name: user-id
+          in: path
+          description: 'key: id or name of user'
+          required: true
+          schema:
+            type: string
+          x-ms-docs-key-type: user
+      responses:
+        '200':
+          description: Retrieved photo
+          content:
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+        default:
+          $ref: '#/components/responses/error'
   /v1.0/education/users:
     get:
       tags:
