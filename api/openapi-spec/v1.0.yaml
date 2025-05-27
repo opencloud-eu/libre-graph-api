@@ -204,6 +204,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/orderby'
         - $ref: '#/components/parameters/drivesFilter'
+        - $ref: '#/components/parameters/drivesExpand'
       responses:
         '200':
           description: Retrieved spaces
@@ -274,6 +275,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/orderby'
         - $ref: '#/components/parameters/drivesFilter'
+        - $ref: '#/components/parameters/drivesExpand'
       responses:
         '200':
           description: Retrieved spaces
@@ -5644,6 +5646,15 @@ components:
           value: driveType eq 'project'
         filter by id:
           value: id eq 'uuid'
+    drivesExpand:
+      name: $expand
+      in: query
+      description: Expand related entities
+      schema:
+        type: string
+      examples:
+        expand drive permissions:
+          value: root($expand=permissions)
     usersFilter:
       name: $filter
       in: query
