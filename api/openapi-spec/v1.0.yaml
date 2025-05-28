@@ -797,6 +797,8 @@ paths:
           x-ms-docs-key-type: drive
         - $ref: '#/components/parameters/permissionsFilter'
         - $ref: '#/components/parameters/permissionsSelect'
+        - $ref: '#/components/parameters/count'
+        - $ref: '#/components/parameters/top'
       responses:
         '200':
           description: Retrieved resource
@@ -845,6 +847,9 @@ paths:
                     items:
                       $ref: '#/components/schemas/permission'
                   #  maxItems: 100
+                  '@odata.count':
+                    type: integer
+                    description: The total number of permissions available, only present if the `count` query parameter is set to true.
                   #'@odata.nextLink':
                   #  type: string
               example:
@@ -1610,6 +1615,8 @@ paths:
           x-ms-docs-key-type: item
         - $ref: '#/components/parameters/permissionsFilter'
         - $ref: '#/components/parameters/permissionsSelect'
+        - $ref: '#/components/parameters/count'
+        - $ref: '#/components/parameters/top'
       responses:
         '200':
           description: Retrieved resource
@@ -1658,6 +1665,9 @@ paths:
                     items:
                       $ref: '#/components/schemas/permission'
                   #  maxItems: 100
+                  '@odata.count':
+                    type: integer
+                    description: The total number of permissions available, only present if the `count` query parameter is set to true.
                   #'@odata.nextLink':
                   #  type: string
               example:
