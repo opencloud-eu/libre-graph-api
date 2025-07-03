@@ -4246,6 +4246,10 @@ components:
           items:
             $ref: '#/components/schemas/driveItem'
           description: A collection of special drive resources.
+        '@libre.graph.hasTrashedItems':
+          type: boolean
+          description: Indicates whether the drive has items in the trash. Read-only.
+          readOnly: true
     driveRecipient:
       type: object
       description: |
