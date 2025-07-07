@@ -205,6 +205,7 @@ paths:
         - $ref: '#/components/parameters/orderby'
         - $ref: '#/components/parameters/drivesFilter'
         - $ref: '#/components/parameters/drivesExpand'
+        - $ref: '#/components/parameters/drivesSelect'
       responses:
         '200':
           description: Retrieved spaces
@@ -276,6 +277,7 @@ paths:
         - $ref: '#/components/parameters/orderby'
         - $ref: '#/components/parameters/drivesFilter'
         - $ref: '#/components/parameters/drivesExpand'
+        - $ref: '#/components/parameters/drivesSelect'
       responses:
         '200':
           description: Retrieved spaces
@@ -369,6 +371,7 @@ paths:
           schema:
             type: string
           x-ms-docs-key-type: drive
+        - $ref: '#/components/parameters/drivesSelect'
       responses:
         '200':
           description: Retrieved drive
@@ -5660,6 +5663,19 @@ components:
           value: driveType eq 'project'
         filter by id:
           value: id eq 'uuid'
+    drivesSelect:
+      name: $select
+      in: query
+      description: Select properties to be returned. By default all properties are returned.
+      style: form
+      explode: false
+      schema:
+        uniqueItems: true
+        type: array
+        items:
+          enum:
+            - '@libre.graph.hasTrashedItems'
+          type: string
     drivesExpand:
       name: $expand
       in: query
