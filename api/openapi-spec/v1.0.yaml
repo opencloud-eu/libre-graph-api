@@ -4131,6 +4131,9 @@ components:
         schoolNumber:
           type: string
           description: School number
+        externalId:
+          type: string
+          description: External identifier of the school
         terminationDate:
           type: string
           format: date-time
