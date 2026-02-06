@@ -1,14 +1,23 @@
 openapi: 3.0.1
 info:
   title: Libre Graph API
-  description: Libre Graph is a free API for cloud collaboration inspired by the MS Graph API.
+  description: Libre Graph is a free API for cloud collaboration inspired by the MS Graph API. The code of the swagger is available at <https://github.com/opencloud-eu/libre-graph-api/>
   version: v1.0.8
   license:
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
 servers:
-  - url: https://localhost:9200/graph
-    description: OpenCloud Development Setup
+  - url: https://{domain}:{port}/{basePath}
+    description: The domain of the open cloud instance to test
+    variables:
+      domain:
+        default: localhost
+        description: Change stis value to the domain of your OpenCloud instance
+      port:
+        description: The port of your open cloud instance
+        default: '443'
+      basePath:
+        default: graph
 paths:
   '/v1.0/me':
     patch:
