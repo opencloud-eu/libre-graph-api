@@ -2593,6 +2593,27 @@ paths:
           $ref: '#/components/responses/error'
       x-ms-docs-operation-type: operation
 
+  /v1.0/invitations:
+    post:
+      tags:
+        - invitations
+      summary: Create a new invitation
+      operationId: CreateInvitation
+      requestBody:
+        description: New invitation
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/invitation'
+      responses:
+        '201':
+          description: Invitation created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/invitation'
+      x-ms-docs-operation-type: operation
+
   /v1.0/users:
     get:
       tags:
@@ -4461,6 +4482,77 @@ components:
         '@libre.graph.userType':
           type: string
           description: 'The type of the identity. This can be either "Member" for regular user, "Guest" for guest users or "Federated" for users imported from a federated instance. Can be used by clients to indicate the type of user. For more details, clients should look up and cache the user at the /users endpoint.'
+    invitation:
+      type: object
+      description: |
+        Represents an invitation to a drive item.
+      properties:
+        invitedUserDisplayName:
+          type: string
+          description: The display name of the user being invited.
+        invitedUserEmailAddress:
+          type: string
+          description: The email address of the user being invited. Required.
+        invitedUserMessageInfo:
+          $ref: '#/components/schemas/invitedUserMessageInfo'
+          description: Additional information about the invitation message.
+        sendInvitationMessage:
+          type: boolean
+          description: Indicates whether an invitation message should be sent to the user.
+        inviteRedirectUrl:
+          type: string
+          description: The URL to which the user is redirected after accepting the invitation. Required.
+        inviteRedeemUrl:
+          type: string
+          description: The URL that the user can use to redeem the invitation. Read-only.
+          readOnly: true
+        status:
+          type: string
+          description: The status of the invitation. Read-only.
+          readOnly: true
+        invitedUser:
+          $ref: '#/components/schemas/user'
+          description: The user object of the invited user. Read-only.
+          readOnly: true
+        invitedUserType:
+          type: string
+          description: The type of user being invited.
+        resetRedemption:
+          type: boolean
+          description: Indicates whether the invitation redemption should be reset.
+    invitedUserMessageInfo:
+      type: object
+      description: Additional information about the invitation message.
+      properties:
+        ccRecipients:
+          type: array
+          items:
+            $ref: '#/components/schemas/recipient'
+          description: Additional recipients who will receive a copy of the invitation message.
+        customizedMessageBody:
+          type: string
+          description: The customized message body that will be included in the invitation message.
+        messageLanguage:
+          type: string
+          description: The language of the invitation message.
+    recipient:
+      type: object
+      description: Represents a recipient of an invitation.
+      properties:
+        emailAddress:
+          $ref: '#/components/schemas/emailAddress'
+          description: The email address of the recipient.
+    emailAddress:
+      type: object
+      description: Represents an email address.
+      properties:
+        address:
+          type: string
+          description: The email address.
+        name:
+          type: string
+          description: The name associated with the email address.
+
     objectIdentity:
       description: Represents an identity used to sign in to a user account
       type: object
