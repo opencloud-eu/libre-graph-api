@@ -142,15 +142,15 @@ paths:
         default:
           $ref: '#/components/responses/error'
     delete:
-        tags:
-          - me.photo
-        summary: Delete the current user's profile photo
-        operationId: DeleteOwnUserPhoto
-        responses:
-          '204':
-            description: Success
-          default:
-            $ref: '#/components/responses/error'
+      tags:
+        - me.photo
+      summary: Delete the current user's profile photo
+      operationId: DeleteOwnUserPhoto
+      responses:
+        '204':
+          description: Success
+        default:
+          $ref: '#/components/responses/error'
   '/v1beta1/extensions/org.libregraph/activities':
     get:
       tags:
@@ -2613,6 +2613,45 @@ paths:
               schema:
                 $ref: '#/components/schemas/invitation'
       x-ms-docs-operation-type: operation
+    get:
+      tags:
+        - invitations
+      summary: Get a list of invitations
+      operationId: ListInvitations
+      responses:
+        '200':
+          description: Retrieved invitations
+          content:
+            application/json:
+              schema:
+                title: Collection of invitations
+                type: object
+                properties:
+                  value:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/invitation'
+
+  /v1.0/invitations/{invitation-id}:
+    get:
+      tags:
+        - invitations
+      summary: Get an invitation by key
+      operationId: GetInvitation
+      parameters:
+        - name: invitation-id
+          in: path
+          description: 'key: id of invitation'
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Retrieved invitation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/invitation'
 
   /v1.0/users:
     get:
