@@ -2471,6 +2471,52 @@ paths:
         default:
           $ref: '#/components/responses/error'
       x-ms-docs-operation-type: operation
+  /v1.0/me/drive/items/{item-id}/follow:
+    post:
+      tags:
+        - me.drive
+      summary: Follow a DriveItem
+      description: Follow a DriveItem.
+      operationId: FollowDriveItem
+      parameters:
+        - name: item-id
+          in: path
+          description: 'key: id of item'
+          required: true
+          schema:
+            type: string
+          x-ms-docs-key-type: item
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/driveItem"
+        default:
+          $ref: "#/components/responses/error"
+      x-ms-docs-operation-type: operation
+  /v1.0/me/drive/following/{item-id}:
+    delete:
+      tags:
+        - me.drive
+      summary: Unfollow a DriveItem
+      description: Unfollow a DriveItem.
+      operationId: UnfollowDriveItem
+      parameters:
+        - name: item-id
+          in: path
+          description: "key: id of item"
+          required: true
+          schema:
+            type: string
+          x-ms-docs-key-type: item
+      responses:
+        "204":
+          description: No Content
+        default:
+          $ref: "#/components/responses/error"
+      x-ms-docs-operation-type: operation
 
   /v1beta1/me/drive/sharedWithMe:
     get:
