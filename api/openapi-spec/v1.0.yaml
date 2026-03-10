@@ -4517,9 +4517,6 @@ components:
         invitedUserType:
           type: string
           description: The type of user being invited.
-        resetRedemption:
-          type: boolean
-          description: Indicates whether the invitation redemption should be reset.
     invitedUserMessageInfo:
       type: object
       description: Additional information about the invitation message.
