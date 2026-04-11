@@ -5137,6 +5137,31 @@ components:
           type: string
           format: date-time
           description: Represents the date and time the photo was taken. Read-only.
+        '@libre.graph.motionPhoto':
+          type: integer
+          format: int32
+          readOnly: true
+          description: |
+            Indicates whether the file is a Motion Photo (a still image with an embedded video clip).
+            1 means the file should be treated as a Motion Photo, 0 or absent means it should not.
+            Based on Camera:MotionPhoto from the Google Motion Photo format specification.
+            https://developer.android.com/media/platform/motion-photo-format
+        '@libre.graph.motionPhotoVersion':
+          type: integer
+          format: int32
+          readOnly: true
+          description: |
+            The file format version of the Motion Photo. Currently always 1.
+            Based on Camera:MotionPhotoVersion from the Google Motion Photo format specification.
+        '@libre.graph.motionPhotoPresentationTimestampUs':
+          type: integer
+          format: int64
+          readOnly: true
+          description: |
+            Presentation timestamp in microseconds of the video frame that corresponds to the still image.
+            A value of -1 indicates unspecified. If absent, readers should use a timestamp near the
+            middle of the video track.
+            Based on Camera:MotionPhotoPresentationTimestampUs from the Google Motion Photo format specification.
     geoCoordinates:
       type: object
       readOnly: true
