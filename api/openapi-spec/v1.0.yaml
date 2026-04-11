@@ -1207,6 +1207,18 @@ paths:
           example: a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668!share-id
           x-ms-docs-key-type: item
         - $ref: '#/components/parameters/driveItemSelect'
+        - name: $expand
+          in: query
+          description: Expand related entities
+          style: form
+          explode: false
+          schema:
+            uniqueItems: true
+            type: array
+            items:
+              enum:
+                - extensions
+              type: string
       responses:
         "200":
           description: Retrieved driveItem
@@ -2186,7 +2198,7 @@ paths:
                     assignee: "alice"
                     priority: 3
         "404":
-          description: Extension not found
+          $ref: '#/components/responses/error'
         default:
           $ref: '#/components/responses/error'
       x-ms-docs-operation-type: operation
@@ -2232,7 +2244,11 @@ paths:
             type: string
           example: com.example.project
       requestBody:
-        description: Extension properties to set. Use `null` values to remove individual properties.
+        description: |
+          Extension properties to set. Use `null` values to remove individual properties.
+
+          The `extensionName` is derived from the URL path parameter and must not be included
+          in the request body. If present, it will be ignored.
         required: true
         content:
           application/json:
@@ -2303,7 +2319,7 @@ paths:
         "204":
           description: Extension deleted
         "404":
-          description: Extension not found
+          $ref: '#/components/responses/error'
         default:
           $ref: '#/components/responses/error'
       x-ms-docs-operation-type: operation
