@@ -6623,15 +6623,17 @@ components:
         from:
           type: string
           description: |
-            Defines the lower bound from which to compute the aggregation. This
-            can be a numeric value or a string representation of a date using
-            the format `YYYY-MM-DDTHH:mm:ssZ`. Optional if `to` is provided.
+            Defines the lower bound from which to compute the aggregation.
+            The value is always a string. Numeric bounds must be provided as
+            their string representation (e.g. `"1980"`). Date bounds must use
+            the `YYYY-MM-DDTHH:mm:ssZ` format. Optional if `to` is provided.
         to:
           type: string
           description: |
-            Defines the upper bound up to which to compute the aggregation. This
-            can be a numeric value or a string representation of a date using
-            the format `YYYY-MM-DDTHH:mm:ssZ`. Optional if `from` is provided.
+            Defines the upper bound up to which to compute the aggregation.
+            The value is always a string. Numeric bounds must be provided as
+            their string representation (e.g. `"2000"`). Date bounds must use
+            the `YYYY-MM-DDTHH:mm:ssZ` format. Optional if `from` is provided.
     searchResponse:
       type: object
       description: |
