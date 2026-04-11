@@ -4252,6 +4252,7 @@ paths:
                 requests:
                   type: array
                   description: A collection of one or more search requests.
+                  minItems: 1
                   items:
                     $ref: '#/components/schemas/searchRequest'
             examples:
@@ -5918,6 +5919,7 @@ components:
           description: |
             One or more types of resources expected in the response. Currently
             only `driveItem` is supported.
+          minItems: 1
           items:
             type: string
             enum:
@@ -6027,7 +6029,6 @@ components:
         resource type.
       required:
         - sortBy
-        - isDescending
       properties:
         sortBy:
           type: string
@@ -6043,8 +6044,8 @@ components:
         isDescending:
           type: boolean
           description: |
-            Set to `true` to specify the sort order as descending. The default
-            is `false`, with the sort order as ascending. Required.
+            Set to `true` to specify the sort order as descending. Optional,
+            defaults to `false` (ascending).
           default: false
         minimumCount:
           type: integer
@@ -6070,6 +6071,11 @@ components:
       description: |
         Specifies the lower and upper bound to compute a range aggregation
         bucket. At least one of `from` or `to` must be provided.
+      anyOf:
+        - required:
+            - from
+        - required:
+            - to
       properties:
         from:
           type: string
