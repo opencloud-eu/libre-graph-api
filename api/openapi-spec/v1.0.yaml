@@ -5162,6 +5162,14 @@ components:
             A value of -1 indicates unspecified. If absent, readers should use a timestamp near the
             middle of the video track.
             Based on Camera:MotionPhotoPresentationTimestampUs from the Google Motion Photo format specification.
+        '@libre.graph.motionPhotoVideoSize':
+          type: integer
+          format: int64
+          readOnly: true
+          description: |
+            Size in bytes of the embedded video portion of the Motion Photo.
+            Clients can use this together with the file size to construct a Range request
+            that fetches only the video part: Range: bytes=<fileSize - motionPhotoVideoSize>-
     geoCoordinates:
       type: object
       readOnly: true
