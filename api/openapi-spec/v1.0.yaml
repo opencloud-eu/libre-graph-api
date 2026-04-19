@@ -1324,8 +1324,9 @@ paths:
         URL for the file. This is the same URL that is returned via the
         `@microsoft.graph.downloadUrl` instance annotation on the driveItem when
         requested via `$select`. Choose between the two based on whether you
-        want the server to follow the redirect for you (`/content`) or you want
-        to inspect / schedule / prefetch the URL yourself (annotation).
+        want to call the redirecting `/content` endpoint directly (for example,
+        with a client that follows redirects automatically) or you want to
+        inspect / schedule / prefetch the URL yourself via the annotation.
 
         The pre-authenticated URL is short-lived and does not require an
         `Authorization` header.
@@ -5999,7 +6000,8 @@ components:
           type: string
       examples:
         request download url:
-          value: '@microsoft.graph.downloadUrl'
+          value:
+            - '@microsoft.graph.downloadUrl'
     drivesFilter:
       name: $filter
       in: query
