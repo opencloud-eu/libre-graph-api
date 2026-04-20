@@ -1354,8 +1354,10 @@ paths:
           description: Pre-authenticated redirect to the file content.
           headers:
             Location:
+              required: true
               schema:
                 type: string
+                format: uri
               description: The pre-authenticated URL where the content can be downloaded.
         '404':
           description: The driveItem was not found or is not a file.
