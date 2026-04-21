@@ -2223,6 +2223,7 @@ paths:
           schema:
             type: string
           x-ms-docs-key-type: drive
+        - $ref: '#/components/parameters/driveItemSelect'
       responses:
         '200':
           description: Retrieved resource
@@ -2607,6 +2608,8 @@ paths:
         - me.drive.root
       summary: Get root from personal space
       operationId: HomeGetRoot
+      parameters:
+        - $ref: '#/components/parameters/driveItemSelect'
       responses:
         '200':
           description: Retrieved resource
@@ -2623,6 +2626,8 @@ paths:
         - me.drive.root.children
       summary: Get children from drive
       operationId: HomeGetChildren
+      parameters:
+        - $ref: '#/components/parameters/driveItemSelect'
       responses:
         '200':
           description: Retrieved resource list
