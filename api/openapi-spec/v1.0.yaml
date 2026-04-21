@@ -6291,7 +6291,7 @@ components:
     driveItemSelect:
       name: $select
       in: query
-      description: Instance annotations to include in the response.
+      description: Select additional properties to be returned.
       style: form
       explode: false
       schema:
