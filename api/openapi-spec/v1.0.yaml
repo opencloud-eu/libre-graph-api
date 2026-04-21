@@ -5187,6 +5187,21 @@ components:
           items:
             type: string
           readOnly: true
+        '@libre.graph.permissions.actions.allowedValues':
+          type: array
+          description: |
+            A list of actions the caller is allowed to perform on this item.
+
+            Only returned when explicitly requested via `$select` on endpoints
+            that support it. Mirrors the annotation of the same name on the
+            `/permissions` endpoint, allowing clients to learn a caller's
+            effective actions on an item without a separate round-trip.
+
+            See the `/permissions` endpoint for the mapping between CS3
+            `ResourcePermissions` and libre.graph actions.
+          items:
+            type: string
+          readOnly: true
     sharingLinkType:
       type: string
       enum: [ internal, view, upload, edit, createOnly, blocksDownload ]
@@ -6279,7 +6294,10 @@ components:
     driveItemSelect:
       name: $select
       in: query
-      description: Select additional properties to be returned.
+      description: |
+        Select properties to be returned. By default all properties are returned, except for
+        instance annotations (prefixed with `@`) that are computationally expensive or
+        short-lived. Instance annotations must be explicitly requested via `$select`.
       style: form
       explode: false
       schema:
@@ -6288,11 +6306,15 @@ components:
         items:
           enum:
             - '@microsoft.graph.downloadUrl'
+            - '@libre.graph.permissions.actions.allowedValues'
           type: string
       examples:
         request download url:
           value:
             - '@microsoft.graph.downloadUrl'
+        request allowed actions:
+          value:
+            - '@libre.graph.permissions.actions.allowedValues'
     drivesFilter:
       name: $filter
       in: query
