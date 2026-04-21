@@ -6291,10 +6291,7 @@ components:
     driveItemSelect:
       name: $select
       in: query
-      description: |
-        Select properties to be returned. By default all properties are returned, except for
-        instance annotations (prefixed with `@`) that are computationally expensive or
-        short-lived. Instance annotations must be explicitly requested via `$select`.
+      description: Instance annotations to include in the response.
       style: form
       explode: false
       schema:
