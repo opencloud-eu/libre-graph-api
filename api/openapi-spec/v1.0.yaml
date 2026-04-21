@@ -4914,6 +4914,9 @@ components:
         video:
           description: Video metadata, if the item is a video. Read-only.
           $ref: '#/components/schemas/video'
+        '@libre.graph.motionPhoto':
+          description: Motion Photo metadata, if the item is a Motion Photo. Read-only.
+          $ref: '#/components/schemas/motionPhoto'
         '@client.synchronize':
           description: Indicates if the item is synchronized with the underlying storage provider. Read-only.
           type: boolean
@@ -5137,39 +5140,38 @@ components:
           type: string
           format: date-time
           description: Represents the date and time the photo was taken. Read-only.
-        '@libre.graph.motionPhoto':
+    motionPhoto:
+      type: object
+      readOnly: true
+      description: |
+        Motion Photo metadata. A Motion Photo is a still image with a short video clip appended to
+        the end of the file. The presence of this facet on a driveItem indicates that the item is
+        a Motion Photo; absence indicates it is not.
+
+        Based on the Google Motion Photo format v1.0 specification:
+        https://developer.android.com/media/platform/motion-photo-format
+      properties:
+        version:
           type: integer
           format: int32
+          description: The file format version of the Motion Photo. Currently always 1. Read-only.
           readOnly: true
-          description: |
-            Indicates whether the file is a Motion Photo (a still image with an embedded video clip).
-            1 means the file should be treated as a Motion Photo, 0 or absent means it should not.
-            Based on Camera:MotionPhoto from the Google Motion Photo format specification.
-            https://developer.android.com/media/platform/motion-photo-format
-        '@libre.graph.motionPhotoVersion':
-          type: integer
-          format: int32
-          readOnly: true
-          description: |
-            The file format version of the Motion Photo. Currently always 1.
-            Based on Camera:MotionPhotoVersion from the Google Motion Photo format specification.
-        '@libre.graph.motionPhotoPresentationTimestampUs':
+        presentationTimestampUs:
           type: integer
           format: int64
-          readOnly: true
           description: |
-            Presentation timestamp in microseconds of the video frame that corresponds to the still image.
-            A value of -1 indicates unspecified. If absent, readers should use a timestamp near the
-            middle of the video track.
-            Based on Camera:MotionPhotoPresentationTimestampUs from the Google Motion Photo format specification.
-        '@libre.graph.motionPhotoVideoSize':
+            Presentation timestamp in microseconds of the video frame that corresponds to the still
+            image. A value of -1 indicates unspecified. If absent, readers should use a timestamp
+            near the middle of the video track. Read-only.
+          readOnly: true
+        videoSize:
           type: integer
           format: int64
-          readOnly: true
           description: |
-            Size in bytes of the embedded video portion of the Motion Photo.
-            Clients can use this together with the file size to construct a Range request
-            that fetches only the video part: Range: bytes=<fileSize - motionPhotoVideoSize>-
+            Size in bytes of the embedded video portion of the file. The video is appended at the
+            end of the file, so clients can fetch it with a Range request:
+            `Range: bytes=<fileSize - videoSize>-`. Read-only.
+          readOnly: true
     geoCoordinates:
       type: object
       readOnly: true
