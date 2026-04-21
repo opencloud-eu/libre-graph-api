@@ -5196,9 +5196,6 @@ components:
             that support it. Mirrors the annotation of the same name on the
             `/permissions` endpoint, allowing clients to learn a caller's
             effective actions on an item without a separate round-trip.
-
-            See the `/permissions` endpoint for the mapping between CS3
-            `ResourcePermissions` and libre.graph actions.
           items:
             type: string
           readOnly: true
