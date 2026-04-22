@@ -8,13 +8,13 @@ info:
     url: https://www.apache.org/licenses/LICENSE-2.0.html
 servers:
   - url: https://{domain}:{port}/{basePath}
-    description: The domain of the open cloud instance to test
+    description: The domain of the OpenCloud instance to test
     variables:
       domain:
         default: localhost
-        description: Change stis value to the domain of your OpenCloud instance
+        description: Change this value to the domain of your OpenCloud instance
       port:
-        description: The port of your open cloud instance
+        description: The port of your OpenCloud instance
         default: '443'
       basePath:
         default: graph
