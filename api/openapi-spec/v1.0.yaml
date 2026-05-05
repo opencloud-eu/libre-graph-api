@@ -1207,18 +1207,7 @@ paths:
           example: a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668!share-id
           x-ms-docs-key-type: item
         - $ref: '#/components/parameters/driveItemSelect'
-        - name: $expand
-          in: query
-          description: Expand related entities
-          style: form
-          explode: false
-          schema:
-            uniqueItems: true
-            type: array
-            items:
-              enum:
-                - extensions
-              type: string
+        - $ref: '#/components/parameters/driveItemExpand'
       responses:
         "200":
           description: Retrieved driveItem
@@ -6280,6 +6269,19 @@ components:
         request download url:
           value:
             - '@microsoft.graph.downloadUrl'
+    driveItemExpand:
+      name: $expand
+      in: query
+      description: Expand related entities
+      style: form
+      explode: false
+      schema:
+        uniqueItems: true
+        type: array
+        items:
+          enum:
+            - extensions
+          type: string
     drivesFilter:
       name: $filter
       in: query
