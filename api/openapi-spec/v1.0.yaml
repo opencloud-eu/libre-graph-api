@@ -6817,6 +6817,7 @@ components:
           enum:
             - children
             - thumbnails
+            - extensions
           type: string
       examples:
         request children:
@@ -6825,6 +6826,9 @@ components:
         request thumbnails:
           value:
             - thumbnails
+        request extensions:
+          value:
+            - extensions
     drivesFilter:
       name: $filter
       in: query
