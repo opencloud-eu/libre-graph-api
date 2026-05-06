@@ -4362,13 +4362,10 @@ paths:
                                 buckets:
                                   - key: Pink Floyd
                                     count: 42
-                                    aggregationFilterToken: Pink Floyd
                                   - key: Led Zeppelin
                                     count: 35
-                                    aggregationFilterToken: Led Zeppelin
                                   - key: The Beatles
                                     count: 28
-                                    aggregationFilterToken: The Beatles
         default:
           $ref: '#/components/responses/error'
 components:
@@ -5954,13 +5951,12 @@ components:
         aggregationFilters:
           type: array
           description: |
-            Contains one or more filters to obtain search results narrowed down
-            to a specific value of a field. Build this filter based on a prior
-            search that aggregates by the same field. From the response of the
-            prior search, identify the `searchBucket` that filters results to
-            the specific value of the field, use the string in its
-            `aggregationFilterToken` property, and build an aggregation filter
-            string in the format `"{field}:\"{aggregationFilterToken}\""`.
+            Contains one or more filters to narrow search results to specific
+            values of a field. Each filter is a KQL expression of the form
+            `{field}:"{value}"` for term buckets, or
+            `{field}:range({from},{to})` for range buckets. Field and value
+            should match those returned in `searchBucket.key` and the original
+            `aggregationOption`.
 
             Multiple filters can be provided as separate array items. This
             results in a logical AND between the filters.
@@ -6205,14 +6201,6 @@ components:
           description: |
             The approximate number of search matches that share the same value
             specified in the `key` property.
-        aggregationFilterToken:
-          type: string
-          description: |
-            A token containing the encoded filter to aggregate search matches
-            to the specific key value. To use the filter, pass the token as
-            part of the `aggregationFilters` property in a subsequent
-            `searchRequest`, in the format
-            `"{field}:\"{aggregationFilterToken}\""`.
     odata.error:
       required:
         - error
