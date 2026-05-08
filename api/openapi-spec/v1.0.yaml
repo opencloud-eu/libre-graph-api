@@ -4921,7 +4921,7 @@ components:
         '@UI.Hidden':
           description: Properties or facets (see UI.Facet) annotated with this term will not be rendered if the annotation evaluates to true. Users can set this to hide permissions.
           type: boolean
-        '@libre.graph.user.following':
+        '@libre.graph.me.following':
           description: |
             Indicates whether the current user is following this DriveItem. Read-only.
             Use the FollowDriveItem and UnfollowDriveItem operations to change the following state.
