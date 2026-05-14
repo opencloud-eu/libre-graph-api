@@ -34,7 +34,8 @@ steps:
         --git-repo-id=libre-graph-api-go
         -g go
         -o libre-graph-api-go
-        --api-name-suffix Api'
+        --api-name-suffix Api
+        --type-mappings=binary=io.Reader,file=io.Reader,File=io.Reader'
       - cp LICENSE libre-graph-api-go/LICENSE
   diff:
     image: *alpine_image
