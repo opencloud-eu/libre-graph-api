@@ -1207,6 +1207,7 @@ paths:
           example: a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668!share-id
           x-ms-docs-key-type: item
         - $ref: '#/components/parameters/driveItemSelect'
+        - $ref: '#/components/parameters/driveItemExpand'
       responses:
         "200":
           description: Retrieved driveItem
@@ -2083,6 +2084,231 @@ paths:
                         displayName: "Quick link"
                         quicklink: true
                         webUrl: "https://cloud.example.org/s/erjHgjKjkstTesG"
+        default:
+          $ref: '#/components/responses/error'
+      x-ms-docs-operation-type: operation
+  '/v1beta1/drives/{drive-id}/items/{item-id}/extensions':
+    get:
+      tags:
+        - driveItem.extensions
+      summary: List all extensions on a DriveItem
+      operationId: ListExtensions
+      description: |
+        Get the collection of open extensions on the specified DriveItem.
+
+        Each extension is identified by its `extensionName`, which follows a reverse DNS naming convention
+        (e.g. `com.example.myApp`).
+      parameters:
+        - name: drive-id
+          in: path
+          description: "key: id of drive"
+          required: true
+          schema:
+            type: string
+          example: a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668
+          x-ms-docs-key-type: drive
+        - name: item-id
+          in: path
+          description: "key: id of item"
+          required: true
+          schema:
+            type: string
+          example: a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668!share-id
+          x-ms-docs-key-type: item
+      responses:
+        '200':
+          description: Retrieved extensions
+          content:
+            application/json:
+              schema:
+                title: Collection of openTypeExtensions
+                type: object
+                properties:
+                  value:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/openTypeExtension'
+              examples:
+                list extensions:
+                  value:
+                    value:
+                      - extensionName: "com.example.project"
+                        status: "reviewed"
+                        assignee: "alice"
+                      - extensionName: "eu.opencloud.workflow"
+                        step: "approval"
+        default:
+          $ref: '#/components/responses/error'
+      x-ms-docs-operation-type: operation
+  '/v1beta1/drives/{drive-id}/items/{item-id}/extensions/{extension-name}':
+    get:
+      tags:
+        - driveItem.extensions
+      summary: Get an extension by name
+      operationId: GetExtension
+      description: |
+        Get a specific open extension identified by the extension name.
+      parameters:
+        - name: drive-id
+          in: path
+          description: "key: id of drive"
+          required: true
+          schema:
+            type: string
+          example: a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668
+          x-ms-docs-key-type: drive
+        - name: item-id
+          in: path
+          description: "key: id of item"
+          required: true
+          schema:
+            type: string
+          example: a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668!share-id
+          x-ms-docs-key-type: item
+        - name: extension-name
+          in: path
+          description: "The unique name of the extension, using reverse DNS notation (e.g. com.example.myApp)"
+          required: true
+          schema:
+            type: string
+          example: com.example.project
+      responses:
+        '200':
+          description: Retrieved extension
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/openTypeExtension'
+              examples:
+                get extension:
+                  value:
+                    extensionName: "com.example.project"
+                    status: "reviewed"
+                    assignee: "alice"
+                    priority: 3
+        '404':
+          $ref: '#/components/responses/error'
+        default:
+          $ref: '#/components/responses/error'
+      x-ms-docs-operation-type: operation
+    put:
+      tags:
+        - driveItem.extensions
+      summary: Create or update an extension
+      operationId: UpsertExtension
+      description: |
+        Create or update an open extension on the specified DriveItem.
+
+        If the extension does not exist, it is created. If it already exists, the provided properties
+        are merged with the existing data:
+
+        * Properties included in the request body are added or updated.
+        * Properties set to `null` are removed from the extension.
+        * Properties not included in the request body remain unchanged.
+
+        The extension name should follow reverse DNS naming conventions (e.g. `com.example.myApp`)
+        to avoid collisions between applications.
+      parameters:
+        - name: drive-id
+          in: path
+          description: "key: id of drive"
+          required: true
+          schema:
+            type: string
+          example: a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668
+          x-ms-docs-key-type: drive
+        - name: item-id
+          in: path
+          description: "key: id of item"
+          required: true
+          schema:
+            type: string
+          example: a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668!share-id
+          x-ms-docs-key-type: item
+        - name: extension-name
+          in: path
+          description: "The unique name of the extension, using reverse DNS notation (e.g. com.example.myApp)"
+          required: true
+          schema:
+            type: string
+          example: com.example.project
+      requestBody:
+        description: |
+          Extension properties to set. Use `null` values to remove individual properties.
+
+          The `extensionName` is derived from the URL path parameter and must not be included
+          in the request body. If present, it will be ignored.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/openTypeExtensionUpdate'
+            examples:
+              create extension:
+                value:
+                  status: "reviewed"
+                  assignee: "alice"
+                  priority: 3
+              update single property:
+                value:
+                  status: "approved"
+              remove a property:
+                value:
+                  priority: null
+      responses:
+        '200':
+          description: Extension updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/openTypeExtension'
+        '201':
+          description: Extension created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/openTypeExtension'
+        default:
+          $ref: '#/components/responses/error'
+      x-ms-docs-operation-type: operation
+    delete:
+      tags:
+        - driveItem.extensions
+      summary: Delete an extension
+      operationId: DeleteExtension
+      description: |
+        Delete an open extension from the specified DriveItem.
+
+        This removes the extension and all its properties.
+      parameters:
+        - name: drive-id
+          in: path
+          description: "key: id of drive"
+          required: true
+          schema:
+            type: string
+          example: a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668
+          x-ms-docs-key-type: drive
+        - name: item-id
+          in: path
+          description: "key: id of item"
+          required: true
+          schema:
+            type: string
+          example: a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668!share-id
+          x-ms-docs-key-type: item
+        - name: extension-name
+          in: path
+          description: "The unique name of the extension, using reverse DNS notation (e.g. com.example.myApp)"
+          required: true
+          schema:
+            type: string
+          example: com.example.project
+      responses:
+        '204':
+          description: Extension deleted
+        '404':
+          $ref: '#/components/responses/error'
         default:
           $ref: '#/components/responses/error'
       x-ms-docs-operation-type: operation
@@ -4993,6 +5219,12 @@ components:
         '@UI.Hidden':
           description: Properties or facets (see UI.Facet) annotated with this term will not be rendered if the annotation evaluates to true. Users can set this to hide permissions.
           type: boolean
+        extensions:
+          description: The collection of open extensions defined for this DriveItem. Nullable. Returned only on `$expand`.
+          type: array
+          items:
+            $ref: '#/components/schemas/openTypeExtension'
+          readOnly: true
     sharingLinkType:
       type: string
       enum: [ internal, view, upload, edit, createOnly, blocksDownload ]
@@ -5591,6 +5823,42 @@ components:
         password:
           type: string
           description: Password. It may require a password policy.
+    openTypeExtension:
+      type: object
+      description: |
+        Represents an open extension on a DriveItem, providing a flexible way to attach
+        untyped custom data to a resource.
+
+        Extensions are identified by their `extensionName`, which should follow reverse DNS
+        naming conventions (e.g. `com.example.myApp`) to avoid collisions between applications.
+      required:
+        - extensionName
+      properties:
+        extensionName:
+          type: string
+          description: |
+            The unique identifier of the extension. Use reverse DNS naming conventions
+            (e.g. `com.example.myApp`).
+          readOnly: true
+      additionalProperties: true
+      example:
+        extensionName: "com.example.project"
+        status: "reviewed"
+        assignee: "alice"
+        priority: 3
+    openTypeExtensionUpdate:
+      type: object
+      description: |
+        Properties to set or remove on an open extension.
+
+        * Properties included in the request body are added or updated.
+        * Properties set to `null` are removed from the extension.
+        * Properties not included in the request body remain unchanged.
+      additionalProperties:
+        nullable: true
+      example:
+        status: "approved"
+        priority: null
     audio:
       type: object
       description: |
@@ -6036,6 +6304,19 @@ components:
         request download url:
           value:
             - '@microsoft.graph.downloadUrl'
+    driveItemExpand:
+      name: $expand
+      in: query
+      description: Expand related entities
+      style: form
+      explode: false
+      schema:
+        uniqueItems: true
+        type: array
+        items:
+          enum:
+            - extensions
+          type: string
     drivesFilter:
       name: $filter
       in: query
