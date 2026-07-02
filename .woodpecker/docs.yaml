@@ -1,10 +1,17 @@
 ---
+variables:
+  - &node_image 'node:22-alpine'
+
 when:
   - event: push
     branch: ${CI_REPO_DEFAULT_BRANCH}
   - event: [ manual, tag]
 
 steps:
+  - name: compile-spec
+    image: *node_image
+    commands:
+      - sh scripts/compile-spec.sh
   - name: deploy-staging
     image: debian:latest
     environment:
@@ -22,7 +29,7 @@ steps:
       - ssh-keyscan -t rsa $REMOTE_HOST >> $HOME/.ssh/known_hosts
       - echo "$SSH_KEY" > "$HOME/.ssh/id_rsa"
       - chmod 0600 $HOME/.ssh/id_rsa
-      - rsync -a --exclude '.git' --delete . $REMOTE_HOST:/var/swagger/libre-graph-api
+      - rsync -a --exclude '.git' --exclude 'spec/node_modules' --exclude 'spec/build' --exclude 'build' --delete . $REMOTE_HOST:/var/swagger/libre-graph-api
   - name: deploy-production
     image: debian:latest
     environment:
@@ -39,4 +46,4 @@ steps:
       - ssh-keyscan -t rsa $REMOTE_HOST >> $HOME/.ssh/known_hosts
       - echo "$SSH_KEY" > "$HOME/.ssh/id_rsa"
       - chmod 0600 $HOME/.ssh/id_rsa
-      - rsync -a --exclude '.git' --delete . woodpeckersyncer@$REMOTE_HOST:/var/swagger/libre-graph-api
+      - rsync -a --exclude '.git' --exclude 'spec/node_modules' --exclude 'spec/build' --exclude 'build' --delete . woodpeckersyncer@$REMOTE_HOST:/var/swagger/libre-graph-api
