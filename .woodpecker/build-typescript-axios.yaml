@@ -1,6 +1,7 @@
 ---
 variables:
   - &alpine_image 'owncloudci/alpine:latest'
+  - &node_image 'node:22-alpine'
   - &generator_image 'openapitools/openapi-generator-cli:v7.13.0@sha256:52b4b2bb6129b086b0f12614e98c884d378a84349fa114b07e20515702a793c5'
   - &environment
     HTTP_PROXY:
@@ -21,20 +22,17 @@ steps:
       ref: HEAD
       path: libre-graph-api-typescript-axios
       remote: https://github.com/opencloud-eu/libre-graph-api-typescript-axios.git
+  compile-spec:
+    image: *node_image
+    environment: *environment
+    commands:
+      - sh scripts/compile-spec.sh
   generate-typescript-axios:
     image: *generator_image
     environment: *environment
     commands:
       - rm -Rf libre-graph-api-typescript-axios/*
-      - '/usr/local/bin/docker-entrypoint.sh generate
-        --enable-post-process-file
-        -i api/openapi-spec/v1.0.yaml
-        --additional-properties=packageName=libregraph
-        --git-user-id=opencloud-eu
-        --git-repo-id=libre-graph-api-typescript-axios
-        -g typescript-axios
-        -o libre-graph-api-typescript-axios
-        --api-name-suffix Api'
+      - sh scripts/generate-typescript-axios.sh
       - cp LICENSE libre-graph-api-typescript-axios/LICENSE
   diff:
     image: *alpine_image
