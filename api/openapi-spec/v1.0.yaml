@@ -5292,7 +5292,7 @@ components:
           readOnly: true
         vitalityScore:
           type: number
-          format: float
+          format: double
           description: |
             Score between 0 and 1 rating how interesting the motion clip is, used by
             readers to decide whether to autoplay it
