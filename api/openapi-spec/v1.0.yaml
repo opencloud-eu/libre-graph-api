@@ -5307,14 +5307,6 @@ components:
             (com.apple.quicktime.live-photo.vitality-scoring-version). Only present on
             the video half. Read-only.
           readOnly: true
-        fullFrameRatePlaybackIntent:
-          type: integer
-          format: int32
-          description: |
-            Whether the video is intended to be played back at full frame rate
-            (com.apple.quicktime.full-frame-rate-playback-intent). Only present on the
-            video half. Read-only.
-          readOnly: true
     geoCoordinates:
       type: object
       readOnly: true
