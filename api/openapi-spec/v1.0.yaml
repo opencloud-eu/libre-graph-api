@@ -4976,6 +4976,9 @@ components:
         '@libre.graph.motionPhoto':
           description: Motion Photo metadata, if the item is a Motion Photo. Read-only.
           $ref: '#/components/schemas/motionPhoto'
+        '@libre.graph.livePhoto':
+          description: Live Photo metadata, if the item is part of an Apple Live Photo. Read-only.
+          $ref: '#/components/schemas/livePhoto'
         '@client.synchronize':
           description: Indicates if the item is synchronized with the underlying storage provider. Read-only.
           type: boolean
@@ -5240,6 +5243,62 @@ components:
             Size in bytes of the embedded video portion of the file. The video is appended at the
             end of the file, so clients can fetch it with a Range request:
             `Range: bytes=<fileSize - videoSize>-`. Read-only.
+          readOnly: true
+    livePhoto:
+      type: object
+      readOnly: true
+      description: |
+        Apple Live Photo metadata. A Live Photo is a pair of files sharing one content
+        identifier: a still image (HEIC or JPEG) and a short QuickTime video. Unlike a
+        Motion Photo, the two parts are separate driveItems. The presence of this facet
+        indicates the item was captured as part of a Live Photo; the counterpart is the
+        driveItem whose livePhoto facet carries the same contentId. Whether an item is
+        the still image or the video half follows from its photo/video facets and MIME
+        type.
+
+        There is no public file format specification; the metadata keys are documented
+        as AVFoundation metadata identifiers:
+        https://developer.apple.com/documentation/avfoundation/avmetadataidentifier
+        On the still image they are stored in the Apple maker note, on the video as
+        com.apple.quicktime.* QuickTime metadata keys.
+      properties:
+        contentId:
+          type: string
+          description: |
+            Identifier (UUID) shared by the still image and the paired video of one
+            Live Photo. Read-only.
+          readOnly: true
+        auto:
+          type: boolean
+          description: |
+            True if the device decided automatically whether to capture the Live Photo
+            video (com.apple.quicktime.live-photo.auto). Only present on the video half.
+            Read-only.
+          readOnly: true
+        vitalityScore:
+          type: number
+          format: float
+          description: |
+            Score between 0 and 1 rating how interesting the motion clip is, used by
+            readers to decide whether to autoplay it
+            (com.apple.quicktime.live-photo.vitality-score). Only present on the video
+            half. Read-only.
+          readOnly: true
+        vitalityScoringVersion:
+          type: integer
+          format: int64
+          description: |
+            Version of the algorithm that produced vitalityScore
+            (com.apple.quicktime.live-photo.vitality-scoring-version). Only present on
+            the video half. Read-only.
+          readOnly: true
+        fullFrameRatePlaybackIntent:
+          type: integer
+          format: int32
+          description: |
+            Whether the video is intended to be played back at full frame rate
+            (com.apple.quicktime.full-frame-rate-playback-intent). Only present on the
+            video half. Read-only.
           readOnly: true
     geoCoordinates:
       type: object
