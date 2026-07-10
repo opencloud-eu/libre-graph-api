@@ -2110,6 +2110,60 @@ paths:
         default:
           $ref: '#/components/responses/error'
       x-ms-docs-operation-type: operation
+  '/v1.0/drives/{drive-id}/items/{item-id}/children':
+    get:
+      tags:
+        - driveItem
+      summary: List children of a DriveItem
+      operationId: GetDriveItemChildren
+      description: |
+        List the children of the item identified by `item-id` in the drive identified by `drive-id`. The item must exist and be a folder.
+
+        Modeled on the MS Graph list driveItem children endpoint
+        (https://learn.microsoft.com/en-us/graph/api/driveitem-list-children).
+
+        This endpoint also accepts the MS Graph colon-syntax URL forms:
+
+            GET /v1.0/drives/{drive-id}/root:/{path}:/children
+            GET /v1.0/drives/{drive-id}/items/{item-id}:/{path}:/children
+
+        OpenAPI cannot express the colon-delimited path segment, so these URL forms are not represented as separate operations in this specification. The server still accepts them, resolves `:/{path}:` as the parent item, and lists its children.
+      parameters:
+        - name: drive-id
+          in: path
+          description: 'key: id of drive'
+          required: true
+          schema:
+            type: string
+          example: a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668
+          x-ms-docs-key-type: drive
+        - name: item-id
+          in: path
+          description: 'key: id of item'
+          required: true
+          schema:
+            type: string
+          example: a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668!share-id
+          x-ms-docs-key-type: item
+      responses:
+        '200':
+          description: Retrieved resource list
+          content:
+            application/json:
+              schema:
+                title: Collection of driveItems
+                type: object
+                properties:
+                  value:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/driveItem'
+                    maxItems: 100
+                  '@odata.nextLink':
+                    type: string
+        default:
+          $ref: '#/components/responses/error'
+      x-ms-docs-operation-type: operation
   /v1.0/groups:
     get:
       tags:
