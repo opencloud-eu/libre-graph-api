@@ -53,7 +53,7 @@ steps:
     when:
       - event: tag
   push_target_repo:
-    image: quay.io/thegeeklab/wp-git-action:v2.2.0
+    image: quay.io/thegeeklab/wp-git-action:2.2.0
     settings:
       path: libre-graph-api-php
       remote_url: https://github.com/opencloud-eu/libre-graph-api-php.git
