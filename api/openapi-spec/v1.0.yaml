@@ -4296,6 +4296,123 @@ paths:
           description: No content
         default:
           $ref: '#/components/responses/error'
+  '/v1.0/extensions/org.libregraph/guestLinkAuth/verify/token':
+    post:
+      tags:
+        - guestLinkAuth
+      summary: Verify a guest magic token and create a guest session cookie
+      operationId: VerifyGuestLinkToken
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/guestLinkTokenVerifyRequest'
+            examples:
+              verify token:
+                value:
+                  token: abc123xyz
+      responses:
+        '200':
+          description: Token verified, guest session cookie issued via Set-Cookie header
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/guestLinkSessionResponse'
+        '401':
+          description: Token could not be used
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/guestLinkAuthError'
+              examples:
+                token expired:
+                  value:
+                    error_type: token_expired
+                    message: Your token has expired.
+                    share_id: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
+        default:
+          $ref: '#/components/responses/error'
+  '/v1.0/extensions/org.libregraph/guestLinkAuth/verify/pin':
+    post:
+      tags:
+        - guestLinkAuth
+      summary: Verify a guest PIN and create a guest session cookie
+      operationId: VerifyGuestLinkPin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/guestLinkPinVerifyRequest'
+            examples:
+              verify pin:
+                value:
+                  pin: '123456'
+                  share_id: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
+      responses:
+        '200':
+          description: PIN verified, guest session cookie issued via Set-Cookie header
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/guestLinkSessionResponse'
+        '401':
+          description: PIN or session context is invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/guestLinkAuthError'
+              examples:
+                invalid pin:
+                  value:
+                    error_type: invalid_pin
+                    message: The PIN is invalid.
+                    share_id: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
+                session expired:
+                  value:
+                    error_type: session_expired
+                    message: Your session has expired.
+                    share_id: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
+        default:
+          $ref: '#/components/responses/error'
+  '/v1.0/extensions/org.libregraph/guestLinkAuth/renew':
+    post:
+      tags:
+        - guestLinkAuth
+      summary: Renew guest link credentials and dispatch a new email
+      operationId: RenewGuestLinkAuth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/guestLinkRenewRequest'
+            examples:
+              renew for share:
+                value:
+                  share_id: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
+      responses:
+        '200':
+          description: Renewal dispatched
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/guestLinkRenewResponse'
+        '401':
+          description: Session can no longer be renewed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/guestLinkAuthError'
+              examples:
+                session expired:
+                  value:
+                    error_type: session_expired
+                    message: Your session has expired.
+                    share_id: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
+        default:
+          $ref: '#/components/responses/error'
   /v1.0/applications:
     get:
       tags:
@@ -4485,6 +4602,73 @@ components:
           type: array
           items:
             type: string
+    guestLinkTokenVerifyRequest:
+      type: object
+      required:
+        - token
+      properties:
+        token:
+          type: string
+          description: Magic guest token received from the email link.
+    guestLinkPinVerifyRequest:
+      type: object
+      required:
+        - pin
+        - share_id
+      properties:
+        pin:
+          type: string
+          description: One-time PIN sent with renewed guest credentials.
+        share_id:
+          type: string
+          description: Share identifier from a previous auth error response.
+    guestLinkRenewRequest:
+      type: object
+      required:
+        - share_id
+      properties:
+        share_id:
+          type: string
+          description: Share identifier for which fresh guest credentials are requested.
+    guestLinkSessionResponse:
+      type: object
+      required:
+        - token
+      properties:
+        token:
+          type: string
+          description: Signed JWT to be set as a secure httponly cookie by the client. Valid for 24 hours.
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaGFyZV9pZCI6ImQxNGY5ZjY1IiwicmVhZE9ubHkiOnRydWV9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+    guestLinkRenewResponse:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum:
+            - dispatched
+        message:
+          type: string
+          description: Human-readable status message.
+          example: A new magic link and PIN were sent by email.
+    guestLinkAuthError:
+      type: object
+      required:
+        - error_type
+        - message
+        - share_id
+      properties:
+        error_type:
+          type: string
+          enum:
+            - token_expired
+            - session_expired
+            - invalid_pin
+        message:
+          type: string
+        share_id:
+          type: string
     educationSchool:
       description: Represents a school
       type: object
@@ -4708,7 +4892,7 @@ components:
           description: The unique identifier for the recipient in the directory.
         "@libre.graph.recipient.type":
           type: string
-          description: When the recipient is referenced by objectId this annotation is used to differentiate `user` and `group` recipients.
+          description: When the recipient is referenced by objectId this annotation is used to differentiate `user`, `group` and `mail` recipients.
           default: user
     identitySet:
       type: object
