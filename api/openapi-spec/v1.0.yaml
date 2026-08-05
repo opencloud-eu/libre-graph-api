@@ -3156,6 +3156,35 @@ paths:
         default:
           $ref: '#/components/responses/error'
       x-ms-docs-operation-type: operation
+  '/v1.0/users/{user-id}/drive':
+    get:
+      tags:
+        - user.drive
+      summary: Get a user's drive.
+      operationId: GetUserDrive
+      description: |
+        Get the personal Drive of the user identified by `user-id`.
+
+        Modeled on the MS Graph get drive endpoint
+        (https://learn.microsoft.com/en-us/graph/api/drive-get).
+      parameters:
+        - name: user-id
+          in: path
+          description: 'key: id or name of user'
+          required: true
+          schema:
+            type: string
+          x-ms-docs-key-type: user
+      responses:
+        '200':
+          description: Retrieved drive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/drive'
+        default:
+          $ref: '#/components/responses/error'
+      x-ms-docs-operation-type: operation
   '/v1.0/users/{user-id}/exportPersonalData':
     post:
       tags:
