@@ -2234,6 +2234,45 @@ paths:
         default:
           $ref: '#/components/responses/error'
       x-ms-docs-operation-type: operation
+  '/v1.0/drives/{drive-id}/items/{item-id}':
+    get:
+      tags:
+        - driveItem
+      summary: Get a DriveItem.
+      operationId: GetDriveItemV1
+      description: |
+        Get a DriveItem by using its ID.
+
+        Modeled on the MS Graph get driveItem endpoint
+        (https://learn.microsoft.com/en-us/graph/api/driveitem-get).
+      parameters:
+        - name: drive-id
+          in: path
+          description: 'key: id of drive'
+          required: true
+          schema:
+            type: string
+          example: a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668
+          x-ms-docs-key-type: drive
+        - name: item-id
+          in: path
+          description: 'key: id of item'
+          required: true
+          schema:
+            type: string
+          example: a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668!item-id
+          x-ms-docs-key-type: item
+        - $ref: '#/components/parameters/driveItemSelect'
+      responses:
+        '200':
+          description: Retrieved driveItem
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/driveItem'
+        default:
+          $ref: '#/components/responses/error'
+      x-ms-docs-operation-type: operation
   '/v1.0/drives/{drive-id}/items/{item-id}/children':
     get:
       tags:
