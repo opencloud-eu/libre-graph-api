@@ -5200,6 +5200,9 @@ components:
         '@libre.graph.livePhoto':
           description: Live Photo metadata, if the item is part of an Apple Live Photo. Read-only.
           $ref: '#/components/schemas/livePhoto'
+        '@libre.graph.lock':
+          description: Lock information, present while the item is locked for writing. Read-only.
+          $ref: '#/components/schemas/lock'
         '@client.synchronize':
           description: Indicates if the item is synchronized with the underlying storage provider. Read-only.
           type: boolean
@@ -5553,6 +5556,32 @@ components:
             Version of the algorithm that produced vitalityScore
             (com.apple.quicktime.live-photo.vitality-scoring-version). Only present on
             the video half. Read-only.
+          readOnly: true
+    lock:
+      type: object
+      readOnly: true
+      description: |
+        Information about a write lock on an item, for example one held by an
+        office application. The presence of this facet indicates that the item
+        is locked.
+      properties:
+        appName:
+          type: string
+          description: Name of the application holding the lock. Read-only.
+          readOnly: true
+        ownerName:
+          type: string
+          description: Display name of the user holding the lock. Read-only.
+          readOnly: true
+        lockedDateTime:
+          type: string
+          format: date-time
+          description: Time the lock was acquired. Read-only.
+          readOnly: true
+        expirationDateTime:
+          type: string
+          format: date-time
+          description: Time the lock expires, if a timeout is set. Read-only.
           readOnly: true
     geoCoordinates:
       type: object
