@@ -5140,6 +5140,9 @@ components:
           readOnly: true
         deleted:
           $ref: '#/components/schemas/deleted'
+        pendingOperations:
+          description: Present while operations affecting the item's content have not completed. Read-only.
+          $ref: '#/components/schemas/pendingOperations'
         file:
           $ref: '#/components/schemas/openGraphFile'
         fileSystemInfo:
@@ -5459,6 +5462,29 @@ components:
           type: string
           format: date-time
           description: Represents the date and time the photo was taken. Read-only.
+    pendingOperations:
+      type: object
+      readOnly: true
+      description: |
+        Present while operations affecting the item's content have not
+        completed, whether still queued or already running. While present,
+        requests for the item's content fail, the content is withheld until
+        processing completes and the facet disappears.
+      properties:
+        pendingContentUpdate:
+          type: object
+          readOnly: true
+          description: |
+            An update to the item's content has not completed, for example
+            post-processing such as virus scanning after an upload. In MS
+            Graph reads may return stale data while this is present, in
+            OpenCloud content requests fail instead.
+          properties:
+            queuedDateTime:
+              type: string
+              format: date-time
+              description: Time the operation was queued. May be absent. Read-only.
+              readOnly: true
     motionPhoto:
       type: object
       readOnly: true
