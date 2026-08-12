@@ -6793,6 +6793,10 @@ components:
         For string fields, terms aggregations return the distinct values and
         their counts. For numeric and date fields, range aggregations can be
         defined using the `ranges` property of `bucketDefinition`.
+
+        At most one of `bucketDefinition`, `@libre.graph.metricDefinition`
+        and `@libre.graph.geohashDefinition` may be set; requests specifying
+        more than one are rejected with `invalidRequest`.
       required:
         - field
       properties:
@@ -6808,10 +6812,12 @@ components:
           format: int32
           description: |
             The number of `searchBucket` resources to be returned. This is
-            optional and only applies to terms aggregations. Combined with
-            `bucketDefinition.sortBy` and `bucketDefinition.isDescending` to
-            produce the top N results by count or key. When not specified, all
-            buckets are returned.
+            optional and only applies to terms and geohash aggregations. For
+            terms aggregations it combines with `bucketDefinition.sortBy` and
+            `bucketDefinition.isDescending` to produce the top N results by
+            count or key; for geohash aggregations it limits the buckets to
+            the top N cells by count. When not specified, all buckets are
+            returned.
           minimum: 1
         bucketDefinition:
           $ref: '#/components/schemas/bucketDefinition'
@@ -6829,15 +6835,17 @@ components:
             $ref: '#/components/schemas/aggregationOption'
         '@libre.graph.metricDefinition':
           $ref: '#/components/schemas/metricDefinition'
+        '@libre.graph.geohashDefinition':
+          $ref: '#/components/schemas/geohashDefinition'
     metricDefinition:
       type: object
       description: |
         Provides the details of how to compute a scalar metric over the
         aggregation `field`, the counterpart of `bucketDefinition` for
-        metric aggregations. When set on an `aggregationOption`, `size` and
-        `bucketDefinition` are ignored, and the corresponding
-        `searchAggregation` in the response carries a `@libre.graph.metric`
-        rather than `buckets`. Libregraph extension not present in MS Graph.
+        metric aggregations. When set on an `aggregationOption`, `size` is
+        ignored, and the corresponding `searchAggregation` in the response
+        carries a `@libre.graph.metric` rather than `buckets`. Libregraph
+        extension not present in MS Graph.
       required:
         - kind
       properties:
@@ -6854,6 +6862,28 @@ components:
             - min
             - max
             - avg
+    geohashDefinition:
+      type: object
+      description: |
+        Provides the details of how to compute a geohash-grid aggregation
+        over `field`, which must resolve to a geo-point field (e.g.
+        `location`). When set on an `aggregationOption`, each `searchBucket`
+        of the corresponding `searchAggregation` carries a geohash cell as
+        its `key`, with `count` holding the number of matches in the cell,
+        suitable for density/heatmap rendering. `size` limits the buckets to
+        the top N cells by count. Libregraph extension not present in MS
+        Graph.
+      required:
+        - precision
+      properties:
+        precision:
+          type: integer
+          format: int32
+          description: |
+            The geohash length of the returned cells (1-12); higher means
+            finer cells. Required.
+          minimum: 1
+          maximum: 12
     bucketDefinition:
       type: object
       description: |
@@ -7016,9 +7046,11 @@ components:
         buckets:
           type: array
           description: |
-            Defines the computed buckets for this aggregation. Buckets are
-            sorted according to the `sortBy` and `isDescending` specified in
-            the `bucketDefinition` of the corresponding `aggregationOption`.
+            Defines the computed buckets for this aggregation. For bucket
+            aggregations they are sorted according to the `sortBy` and
+            `isDescending` specified in the `bucketDefinition` of the
+            corresponding `aggregationOption`; for geohash aggregations they
+            are ordered by `count`, descending.
           items:
             $ref: '#/components/schemas/searchBucket'
         '@libre.graph.metric':
@@ -7028,7 +7060,8 @@ components:
       description: |
         The result of a metric aggregation, the counterpart of `buckets` for
         aggregations requested with a `@libre.graph.metricDefinition`.
-        Absent for terms and range aggregations. Libregraph extension not
+        Absent for terms, range and geohash aggregations. Libregraph
+        extension not
         present in MS Graph.
       properties:
         kind:
@@ -7059,6 +7092,7 @@ components:
             The discrete value of the field that was used to compute the
             aggregation. For terms aggregations this is the field value. For
             range aggregations this is a string representation of the range.
+            For geohash aggregations this is a geohash cell.
         count:
           type: integer
           format: int64
@@ -7084,7 +7118,8 @@ components:
             lower bound is written as `min`, an open upper bound as `max`
             followed by `to="le"`, e.g. `range(min, 1980)`,
             `range(1980, 1990)` and `range(2010, max, to="le")`. This is the
-            same encoding MS Graph uses.
+            same encoding MS Graph uses. Geohash buckets carry no token;
+            narrow by location through the search query instead.
         '@libre.graph.subAggregations':
           type: array
           description: |
