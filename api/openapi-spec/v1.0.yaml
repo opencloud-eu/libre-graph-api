@@ -6045,6 +6045,18 @@ components:
             - min
             - max
             - avg
+        geohashPrecision:
+          type: integer
+          format: int32
+          description: |
+            When greater than 0, this is a geohash-grid aggregation over `field`,
+            which must resolve to a geo-point field (e.g. `location`). Each
+            returned `searchBucket` carries a geohash cell as `key` and its
+            count, suitable for density/heatmap rendering. The value is the
+            geohash length (1-12); higher means finer cells. Libregraph
+            extension not present in MS Graph.
+          minimum: 1
+          maximum: 12
     bucketDefinition:
       type: object
       description: |
