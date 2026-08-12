@@ -6521,10 +6521,10 @@ components:
             query string can contain free-text keywords and property filters.
 
             Examples:
-            - `budget report` — free text search
-            - `mediatype:audio` — filter by media type
-            - `audio.artist:"Pink Floyd"` — filter by audio metadata
-            - `audio.genre:Rock AND audio.year:1979` — combined filters
+            - `budget report`: free text search
+            - `mediatype:audio`: filter by media type
+            - `audio.artist:"Pink Floyd"`: filter by audio metadata
+            - `audio.genre:Rock AND audio.year:1979`: combined filters
     aggregationOption:
       type: object
       description: |
