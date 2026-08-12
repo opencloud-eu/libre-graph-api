@@ -6027,6 +6027,19 @@ components:
             aggregations.
           items:
             $ref: '#/components/schemas/aggregationOption'
+        metricKind:
+          type: string
+          description: |
+            When set, this aggregation is a scalar metric over `field`
+            rather than a bucket aggregation: `size` and
+            `bucketDefinition` are ignored, and the corresponding
+            `searchAggregation` in the response carries a `value`
+            rather than `buckets`. Libregraph extension not present in
+            MS Graph.
+          enum:
+            - sum
+            - min
+            - max
     bucketDefinition:
       type: object
       description: |
@@ -6194,6 +6207,25 @@ components:
             the `bucketDefinition` of the corresponding `aggregationOption`.
           items:
             $ref: '#/components/schemas/searchBucket'
+        value:
+          type: number
+          format: double
+          description: |
+            Scalar result for metric aggregations (`metricKind` set on
+            the corresponding `aggregationOption`). Undefined for terms
+            or range aggregations. Libregraph extension not present in
+            MS Graph.
+        metricKind:
+          type: string
+          description: |
+            Echoes the `metricKind` of the corresponding
+            `aggregationOption`, allowing consumers (and the search
+            service's cross-space merge layer) to pick the right
+            reducer when combining results. Libregraph extension.
+          enum:
+            - sum
+            - min
+            - max
     searchBucket:
       type: object
       description: |
