@@ -5962,6 +5962,41 @@ components:
             results in a logical AND between the filters.
           items:
             type: string
+        sortProperties:
+          type: array
+          description: |
+            Contains the ordered collection of fields to sort the results on.
+            If absent, the results are sorted by relevance. See
+            `sortProperty.name` for the set of sortable fields. Optional.
+          items:
+            $ref: '#/components/schemas/sortProperty'
+    sortProperty:
+      type: object
+      description: |
+        Indicates the order to sort search results in. Follows the
+        [MS Graph sortProperty](https://learn.microsoft.com/en-us/graph/api/resources/sortproperty)
+        resource type.
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: |
+            The name of the property to sort the search results by. Required.
+
+            Sortable are the scalar properties carried on the search hit's
+            resource: `name`, `size`, `lastModifiedDateTime`, `mimeType` and
+            the scalar facet properties such as `photo.takenDateTime`,
+            `photo.iso`, `audio.artist`, `audio.year` or `image.width`.
+            Strings sort lexicographically, numbers and dates by value.
+            Multivalued properties (e.g. `tags`) and unknown properties are
+            rejected with `invalidRequest`.
+        isDescending:
+          type: boolean
+          description: |
+            Set to `true` to sort the results in descending order. Optional,
+            defaults to `false` (ascending).
+          default: false
     searchQuery:
       type: object
       description: |
