@@ -6579,10 +6579,15 @@ components:
             `searchAggregation` in the response carries a `value`
             rather than `buckets`. Libregraph extension not present in
             MS Graph.
+
+            `avg` is not a simple reducer (averages of averages are
+            not averages): the backend carries `(sum, count)`
+            internally and emits only `value` on the outermost merge.
           enum:
             - sum
             - min
             - max
+            - avg
     bucketDefinition:
       type: object
       description: |
@@ -6769,6 +6774,7 @@ components:
             - sum
             - min
             - max
+            - avg
     searchBucket:
       type: object
       description: |
