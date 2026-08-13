@@ -4729,6 +4729,12 @@ components:
           type: boolean
           description: Indicates whether the drive has items in the trash. Read-only.
           readOnly: true
+        '@UI.extension':
+          type: string
+          description: |
+            Specifier for the web client that a drive has an associated extension
+            that could potentially be opened by a specific web app (like a file
+            extension).
     driveRecipient:
       type: object
       description: |
