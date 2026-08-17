@@ -3186,6 +3186,44 @@ paths:
         default:
           $ref: '#/components/responses/error'
       x-ms-docs-operation-type: operation
+  '/v1.0/users/{user-id}/teamwork/sendActivityNotification':
+    post:
+      tags:
+        - user.teamwork
+      summary: Send an activity notification to a user
+      description: |
+        Sends a notification about an activity to a user. The sender is the caller, the recipient is
+        the user in the path, `activityType` says what happened and `topic` says what it happened on.
+      operationId: SendActivityNotification
+      parameters:
+        - name: user-id
+          in: path
+          description: 'key: id or name of user'
+          required: true
+          schema:
+            type: string
+          x-ms-docs-key-type: user
+      requestBody:
+        description: The activity the user is notified about.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/activityNotification'
+            examples:
+              a user was mentioned on a driveItem:
+                value:
+                  topic:
+                    source: text
+                    value: "a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668!item-id"
+                  activityType: mentioned
+                  teamsAppId: "8d1c9c88-9e2c-4d0b-9a1e-6a9de1cb9d3c"
+      responses:
+        "202":
+          description: Accepted
+        default:
+          $ref: '#/components/responses/error'
+      x-ms-docs-operation-type: action
   '/v1.0/users/{user-id}/appRoleAssignments':
     description: Provides operations to manage assignments of roles to users.
     get:
@@ -5356,6 +5394,42 @@ components:
         #retainInheritedPermissions:
         #  type: boolean
         #  description: Optional. If `true` (default), any existing inherited permissions are retained on the shared item when sharing this item for the first time. If `false`, all existing permissions are removed when sharing for the first time.
+    activityNotification:
+      type: object
+      description: |
+        An activity someone is notified about.
+      required:
+        - topic
+        - activityType
+        - teamsAppId
+      properties:
+        topic:
+          $ref: '#/components/schemas/activityTopic'
+          description: What the activity happened on.
+        activityType:
+          type: string
+          description: |
+            What happened. Only `mentioned` is supported at the time of writing.
+        teamsAppId:
+          type: string
+          description: |
+            The app the activity happened in, as an id the server knows.
+    activityTopic:
+      type: object
+      description: What an activity happened on.
+      required:
+        - source
+        - value
+      properties:
+        source:
+          type: string
+          description: |
+            How to read the value. Only `text` is supported at the time of writing.
+            built from it.
+          default: text
+        value:
+          type: string
+          description: With the source `text`, the id of the resource the activity happened on.
     deleted:
       type: object
       description: Information about the deleted state of the item. Read-only.
