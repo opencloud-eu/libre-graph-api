@@ -4767,12 +4767,12 @@ components:
           type: boolean
           description: Indicates whether the drive has items in the trash. Read-only.
           readOnly: true
-        '@UI.extension':
+        '@libre.graph.contentType':
           type: string
           description: |
-            Specifier for the web client that a drive has an associated extension
-            that could potentially be opened by a specific web app (like a file
-            extension).
+            Specifier for the web client that a drive is of a certain content type that could
+            potentially be opened by a specific web app. Example: `application/vnd.opencloud.vault`,
+            indicating the drive can be opened by the rclone-crypt web app.
     driveRecipient:
       type: object
       description: |
