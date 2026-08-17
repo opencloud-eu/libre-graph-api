@@ -2328,6 +2328,100 @@ paths:
         default:
           $ref: '#/components/responses/error'
       x-ms-docs-operation-type: operation
+  '/v1.0/drives/{drive-id}/items/{item-id}/createUploadSession':
+    post:
+      tags:
+        - driveItem
+      summary: Create an upload session for a DriveItem.
+      operationId: CreateUploadSession
+      description: |
+        Create an upload session to upload a file, modeled on the MS Graph
+        createUploadSession endpoint
+        (https://learn.microsoft.com/en-us/graph/api/driveitem-createuploadsession).
+
+        NOTE: the documented 200 response reflects what the OpenCloud server
+        currently returns and deviates from MS Graph. The server emits `UploadURL`
+        (not `uploadUrl`) and a CS3-specific `CS3Protocols` array instead of
+        `expirationDateTime` / `nextExpectedRanges`. Documented as-is, open for
+        discussion.
+      parameters:
+        - name: drive-id
+          in: path
+          description: 'key: id of drive'
+          required: true
+          schema:
+            type: string
+          example: a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668
+          x-ms-docs-key-type: drive
+        - name: item-id
+          in: path
+          description: 'key: id of item'
+          required: true
+          schema:
+            type: string
+          example: a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668!item-id
+          x-ms-docs-key-type: item
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                deferCommit:
+                  type: boolean
+                  description: If true, the final creation of the file requires an explicit request.
+                item:
+                  type: object
+                  description: |
+                    Data about the file being uploaded. Only `name` and `fileSize` are
+                    honored by the server; other MS Graph driveItemUploadableProperties
+                    (e.g. '@microsoft.graph.conflictBehavior') are ignored.
+                  properties:
+                    name:
+                      type: string
+                    fileSize:
+                      type: integer
+                      format: int64
+      responses:
+        '200':
+          description: |
+            Upload session created. NOTE: OpenCloud-specific shape, deviates from the
+            MS Graph uploadSession resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  UploadURL:
+                    type: string
+                    description: Upload endpoint for the 'simple' protocol (endpoint + token).
+                  CS3Protocols:
+                    type: array
+                    description: CS3 upload protocols returned by the storage provider.
+                    items:
+                      type: object
+                      properties:
+                        protocol:
+                          type: string
+                        upload_endpoint:
+                          type: string
+                        token:
+                          type: string
+                        available_checksums:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              type:
+                                type: integer
+                              priority:
+                                type: integer
+                        opaque:
+                          type: object
+        default:
+          $ref: '#/components/responses/error'
+      x-ms-docs-operation-type: operation
   /v1.0/groups:
     get:
       tags:
