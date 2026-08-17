@@ -5288,6 +5288,25 @@ components:
           items:
             type: string
           readOnly: true
+        '@libre.graph.shareTypes':
+          type: array
+          description: |
+            The types of shares existing on this item, aggregated over all of
+            its grants. Absent or empty if the item is not shared.
+
+            This is a summary of the item's `permissions` collection. For the
+            full grants use the permissions endpoints, for the caller's own
+            capabilities use `@libre.graph.permissions.actions.allowedValues`.
+
+            Only returned when explicitly requested via `$select`.
+          items:
+            type: string
+            enum:
+              - user
+              - group
+              - link
+              - remote
+          readOnly: true
     sharingLinkType:
       type: string
       enum: [ internal, view, upload, edit, createOnly, blocksDownload ]
