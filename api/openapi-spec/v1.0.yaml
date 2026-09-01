@@ -1248,6 +1248,7 @@ paths:
           example: a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668!share-id
           x-ms-docs-key-type: item
         - $ref: '#/components/parameters/driveItemSelect'
+        - $ref: '#/components/parameters/driveItemExpand'
       responses:
         "200":
           description: Retrieved driveItem
@@ -2224,6 +2225,7 @@ paths:
             type: string
           x-ms-docs-key-type: drive
         - $ref: '#/components/parameters/driveItemSelect'
+        - $ref: '#/components/parameters/driveItemExpand'
       responses:
         '200':
           description: Retrieved resource
@@ -2263,6 +2265,7 @@ paths:
           example: a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668!item-id
           x-ms-docs-key-type: item
         - $ref: '#/components/parameters/driveItemSelect'
+        - $ref: '#/components/parameters/driveItemExpand'
       responses:
         '200':
           description: Retrieved driveItem
@@ -2650,6 +2653,7 @@ paths:
       operationId: HomeGetRoot
       parameters:
         - $ref: '#/components/parameters/driveItemSelect'
+        - $ref: '#/components/parameters/driveItemExpand'
       responses:
         '200':
           description: Retrieved resource
@@ -6479,6 +6483,23 @@ components:
         request allowed actions:
           value:
             - '@libre.graph.permissions.actions.allowedValues'
+    driveItemExpand:
+      name: $expand
+      in: query
+      description: Expand related entities to be returned.
+      style: form
+      explode: false
+      schema:
+        uniqueItems: true
+        type: array
+        items:
+          enum:
+            - children
+          type: string
+      examples:
+        request children:
+          value:
+            - children
     drivesFilter:
       name: $filter
       in: query
