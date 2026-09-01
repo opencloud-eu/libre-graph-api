@@ -5476,9 +5476,9 @@ components:
           readOnly: true
           description: |
             An update to the item's content has not completed, for example
-            post-processing such as virus scanning after an upload. In MS
-            Graph reads may return stale data while this is present, in
-            OpenCloud content requests fail instead.
+            post-processing such as virus scanning after an upload. MS Graph
+            does not specify how reads behave while this is present; in
+            OpenCloud content requests fail.
           properties:
             queuedDateTime:
               type: string
