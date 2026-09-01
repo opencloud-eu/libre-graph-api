@@ -5248,9 +5248,9 @@ components:
         '@libre.graph.livePhoto':
           description: Live Photo metadata, if the item is part of an Apple Live Photo. Read-only.
           $ref: '#/components/schemas/livePhoto'
-        '@libre.graph.lock':
-          description: Lock information, present while the item is locked for writing. Read-only.
-          $ref: '#/components/schemas/lock'
+        lockInfo:
+          description: Lock metadata, if the file is locked. Read-only.
+          $ref: '#/components/schemas/lockInfo'
         '@client.synchronize':
           description: Indicates if the item is synchronized with the underlying storage provider. Read-only.
           type: boolean
@@ -5683,31 +5683,38 @@ components:
             (com.apple.quicktime.live-photo.vitality-scoring-version). Only present on
             the video half. Read-only.
           readOnly: true
-    lock:
+    lockInfo:
       type: object
       readOnly: true
       description: |
-        Information about a write lock on an item, for example one held by an
-        office application. The presence of this facet indicates that the item
-        is locked.
+        Read-only lock metadata for a file, matching the MS Graph beta
+        lockInfo resource. Indicates whether the file is locked, the kind of
+        lock, when it was created, when it expires and who holds it.
       properties:
-        appName:
+        lockType:
           type: string
-          description: Name of the application holding the lock. Read-only.
+          enum: [ none, exclusive, shared, unknownFutureValue ]
+          description: The type of lock currently held on the file. OpenCloud currently only issues exclusive locks; the full value range mirrors MS Graph. Read-only.
           readOnly: true
-        ownerName:
-          type: string
-          description: Display name of the user holding the lock. Read-only.
-          readOnly: true
-        lockedDateTime:
+        createdDateTime:
           type: string
           format: date-time
-          description: Time the lock was acquired. Read-only.
+          description: The date and time when the lock was created, in UTC. Read-only.
           readOnly: true
         expirationDateTime:
           type: string
           format: date-time
-          description: Time the lock expires, if a timeout is set. Read-only.
+          description: The date and time when the lock expires, in UTC. Read-only.
+          readOnly: true
+        owners:
+          type: array
+          items:
+            $ref: '#/components/schemas/identity'
+          description: The collection of users that currently hold the lock on the file. Read-only.
+          readOnly: true
+        '@libre.graph.appName':
+          type: string
+          description: Name of the application holding the lock, for example an office application. Not part of MS Graph. Read-only.
           readOnly: true
     geoCoordinates:
       type: object
