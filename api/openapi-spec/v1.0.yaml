@@ -5693,8 +5693,8 @@ components:
       properties:
         lockType:
           type: string
-          enum: [ none, exclusive, shared, unknownFutureValue ]
-          description: The type of lock currently held on the file. OpenCloud currently only issues exclusive locks; the full value range mirrors MS Graph. Read-only.
+          enum: [ none, exclusive ]
+          description: The type of lock currently held on the file. OpenCloud currently only issues exclusive locks, same as MS Graph, even if it defines more. Read-only.
           readOnly: true
         createdDateTime:
           type: string
