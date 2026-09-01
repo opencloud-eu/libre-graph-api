@@ -535,8 +535,8 @@ paths:
                   remoteItem:
                     id: a-storage-provider-id$a-space-id!a-node-id
       responses:
-        '200':
-          description: Response
+        '201':
+          description: The created DriveItem.
           content:
             application/json:
               schema:
@@ -1416,7 +1416,7 @@ paths:
             schema:
               $ref: '#/components/schemas/driveItem'
       responses:
-        '200':
+        '201':
           description: The created DriveItem.
           content:
             application/json:
