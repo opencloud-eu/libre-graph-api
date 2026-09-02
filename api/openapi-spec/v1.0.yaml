@@ -4541,6 +4541,156 @@ paths:
                     '@libre.graph.weight': 4
         default:
           $ref: '#/components/responses/error'
+  /v1beta1/search/query:
+    post:
+      tags:
+        - search
+      summary: Search for resources
+      operationId: SearchQuery
+      description: |
+        Run a specified search query. Search results are provided in the response.
+
+        The search endpoint allows clients to search for resources across all
+        accessible spaces and retrieve aggregated metadata (facets) about the
+        result set.
+
+        Aggregations can be used to group results by properties such as file type,
+        author, or any indexed metadata field. This is useful for building faceted
+        search UIs or computing statistics about the result set.
+
+        The query string uses KQL (Keyword Query Language) syntax for filtering.
+
+        This endpoint is inspired by the
+        [MS Graph Search API](https://learn.microsoft.com/en-us/graph/api/search-query)
+        and follows the same request/response structure for compatibility.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - requests
+              properties:
+                requests:
+                  type: array
+                  description: A collection of one or more search requests.
+                  minItems: 1
+                  items:
+                    $ref: '#/components/schemas/searchRequest'
+            examples:
+              simple search:
+                summary: Simple keyword search
+                value:
+                  requests:
+                    - entityTypes:
+                        - driveItem
+                      query:
+                        queryString: budget report
+                      from: 0
+                      size: 25
+              search with aggregations:
+                summary: Search with term aggregation
+                value:
+                  requests:
+                    - entityTypes:
+                        - driveItem
+                      query:
+                        queryString: "mediatype:audio"
+                      from: 0
+                      size: 0
+                      aggregations:
+                        - field: audio.artist
+                          size: 10
+                          bucketDefinition:
+                            sortBy: count
+                            isDescending: true
+                            minimumCount: 1
+              search with range aggregation:
+                summary: Search with numeric range aggregation
+                value:
+                  requests:
+                    - entityTypes:
+                        - driveItem
+                      query:
+                        queryString: "mediatype:audio"
+                      size: 0
+                      aggregations:
+                        - field: audio.year
+                          bucketDefinition:
+                            sortBy: keyAsString
+                            isDescending: true
+                            minimumCount: 0
+                            ranges:
+                              - from: "1970"
+                                to: "1980"
+                              - from: "1980"
+                                to: "1990"
+                              - from: "1990"
+                                to: "2000"
+                              - from: "2000"
+                                to: "2010"
+                              - from: "2010"
+              search with aggregation filter:
+                summary: Narrow results using an aggregation filter from a previous search
+                value:
+                  requests:
+                    - entityTypes:
+                        - driveItem
+                      query:
+                        queryString: "mediatype:audio"
+                      from: 0
+                      size: 25
+                      aggregationFilters:
+                        - "audio.artist:\"Pink Floyd\""
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  value:
+                    type: array
+                    description: A collection of search response objects, one per request.
+                    items:
+                      $ref: '#/components/schemas/searchResponse'
+              examples:
+                search results with aggregations:
+                  value:
+                    value:
+                      - searchTerms:
+                          - "mediatype:audio"
+                        hitsContainers:
+                          - hits:
+                              - hitId: "4b478257-c9e8-458a-b764-fd7ed6cc1087$5d58a5c3-b244-4e9c-b082-82c3f1adbe8a!9d94e3d7"
+                                rank: 1
+                                resource:
+                                  name: Comfortably Numb.flac
+                                  size: 45678901
+                                  audio:
+                                    artist: Pink Floyd
+                                    album: The Wall
+                                    title: Comfortably Numb
+                                    genre: Rock
+                                    year: 1979
+                                    track: 6
+                                    disc: 2
+                                    duration: 382000
+                            total: 142
+                            moreResultsAvailable: true
+                            aggregations:
+                              - field: audio.artist
+                                buckets:
+                                  - key: Pink Floyd
+                                    count: 42
+                                  - key: Led Zeppelin
+                                    count: 35
+                                  - key: The Beatles
+                                    count: 28
+        default:
+          $ref: '#/components/responses/error'
 components:
   schemas:
     tagAssignment:
@@ -6334,6 +6484,364 @@ components:
         #  type: array
         #  items:
         #    type: string
+    searchRequest:
+      type: object
+      description: |
+        Represents an individual search request within a search query. Follows
+        the [MS Graph searchRequest](https://learn.microsoft.com/en-us/graph/api/resources/searchrequest)
+        resource type.
+      required:
+        - entityTypes
+        - query
+      properties:
+        entityTypes:
+          type: array
+          description: |
+            One or more types of resources expected in the response. Currently
+            only `driveItem` is supported.
+          minItems: 1
+          items:
+            type: string
+            enum:
+              - driveItem
+        query:
+          $ref: '#/components/schemas/searchQuery'
+        from:
+          type: integer
+          format: int32
+          description: |
+            Specifies the offset for the search results. Offset 0 returns the
+            very first result. Used together with the `size` property for
+            pagination.
+          default: 0
+          minimum: 0
+        size:
+          type: integer
+          format: int32
+          description: |
+            The size of the page to be retrieved. The maximum value is 500.
+            Set to 0 to return only aggregations without any hits.
+          default: 25
+          minimum: 0
+          maximum: 500
+        aggregations:
+          type: array
+          description: |
+            Specifies aggregations (also known as refiners or facets) to be
+            returned alongside the search results. Optional.
+          items:
+            $ref: '#/components/schemas/aggregationOption'
+        aggregationFilters:
+          type: array
+          description: |
+            Contains one or more filters to narrow search results to specific
+            values of a field. Each filter is a KQL expression of the form
+            `{field}:"{value}"` for term buckets, or
+            `{field}:range({from},{to})` for range buckets. Field and value
+            should match those returned in `searchBucket.key` and the original
+            `aggregationOption`.
+
+            Multiple filters can be provided as separate array items. This
+            results in a logical AND between the filters.
+          items:
+            type: string
+    searchQuery:
+      type: object
+      description: |
+        Represents the search query. Follows the
+        [MS Graph searchQuery](https://learn.microsoft.com/en-us/graph/api/resources/searchquery)
+        resource type.
+      required:
+        - queryString
+      properties:
+        queryString:
+          type: string
+          description: |
+            The search query string in KQL (Keyword Query Language) format. The
+            query string can contain free-text keywords and property filters.
+
+            Examples:
+            - `budget report`: free text search
+            - `mediatype:audio`: filter by media type
+            - `audio.artist:"Pink Floyd"`: filter by audio metadata
+            - `audio.genre:Rock AND audio.year:1979`: combined filters
+    aggregationOption:
+      type: object
+      description: |
+        Specifies an aggregation that should be computed and returned alongside
+        search results. Follows the
+        [MS Graph aggregationOption](https://learn.microsoft.com/en-us/graph/api/resources/aggregationoption)
+        resource type.
+
+        For string fields, terms aggregations return the distinct values and
+        their counts. For numeric and date fields, range aggregations can be
+        defined using the `ranges` property of `bucketDefinition`.
+      required:
+        - field
+      properties:
+        field:
+          type: string
+          description: |
+            Specifies the field in the schema of the specified entity type that
+            the aggregation should be computed on. Required.
+
+            Examples: `audio.artist`, `audio.genre`, `audio.year`, `mimeType`.
+        size:
+          type: integer
+          format: int32
+          description: |
+            The number of `searchBucket` resources to be returned. This is
+            optional and only applies to terms aggregations. Combined with
+            `bucketDefinition.sortBy` and `bucketDefinition.isDescending` to
+            produce the top N results by count or key. When not specified, all
+            buckets are returned.
+          minimum: 1
+        bucketDefinition:
+          $ref: '#/components/schemas/bucketDefinition'
+        subAggregations:
+          type: array
+          description: |
+            Nested aggregations computed within each bucket of this
+            aggregation. Libregraph extension not present in MS Graph.
+
+            Backends that don't support native composite aggregations
+            (e.g. bleve) emulate them by walking the matched result
+            set; OpenSearch translates them to native composite
+            aggregations.
+          items:
+            $ref: '#/components/schemas/aggregationOption'
+        metricKind:
+          type: string
+          description: |
+            When set, this aggregation is a scalar metric over `field`
+            rather than a bucket aggregation: `size` and
+            `bucketDefinition` are ignored, and the corresponding
+            `searchAggregation` in the response carries a `value`
+            rather than `buckets`. Libregraph extension not present in
+            MS Graph.
+
+            `avg` is not a simple reducer (averages of averages are
+            not averages): the backend carries `(sum, count)`
+            internally and emits only `value` on the outermost merge.
+          enum:
+            - sum
+            - min
+            - max
+            - avg
+    bucketDefinition:
+      type: object
+      description: |
+        Provides the details of how to generate the aggregation buckets in the
+        response. Follows the
+        [MS Graph bucketAggregationDefinition](https://learn.microsoft.com/en-us/graph/api/resources/bucketaggregationdefinition)
+        resource type.
+      required:
+        - sortBy
+      properties:
+        sortBy:
+          type: string
+          description: |
+            The possible values are `count` to sort by the number of matches in
+            the aggregation, `keyAsString` to sort alphabetically based on the
+            key in the aggregation, and `keyAsNumber` to sort numerically based
+            on the key in the aggregation. Required.
+          enum:
+            - count
+            - keyAsString
+            - keyAsNumber
+        isDescending:
+          type: boolean
+          description: |
+            Set to `true` to specify the sort order as descending. Optional,
+            defaults to `false` (ascending).
+          default: false
+        minimumCount:
+          type: integer
+          format: int32
+          description: |
+            The minimum number of items that should be present in the
+            aggregation for the bucket to be returned in the response.
+            Optional, default is 0.
+          minimum: 0
+          default: 0
+        ranges:
+          type: array
+          description: |
+            Specifies the manual ranges to compute the aggregation buckets.
+            This is only valid for non-string facets of date or numeric type.
+            Optional. Follows the
+            [MS Graph bucketAggregationRange](https://learn.microsoft.com/en-us/graph/api/resources/bucketaggregationrange)
+            resource type.
+          items:
+            $ref: '#/components/schemas/bucketAggregationRange'
+    bucketAggregationRange:
+      type: object
+      description: |
+        Specifies the lower and upper bound to compute a range aggregation
+        bucket. At least one of `from` or `to` must be provided.
+      anyOf:
+        - required:
+            - from
+        - required:
+            - to
+      properties:
+        from:
+          type: string
+          description: |
+            Defines the lower bound from which to compute the aggregation.
+            The value is always a string. Numeric bounds must be provided as
+            their string representation (e.g. `"1980"`). Date bounds must use
+            the `YYYY-MM-DDTHH:mm:ssZ` format. Optional if `to` is provided.
+        to:
+          type: string
+          description: |
+            Defines the upper bound up to which to compute the aggregation.
+            The value is always a string. Numeric bounds must be provided as
+            their string representation (e.g. `"2000"`). Date bounds must use
+            the `YYYY-MM-DDTHH:mm:ssZ` format. Optional if `from` is provided.
+    searchResponse:
+      type: object
+      description: |
+        Represents the response for an individual search request. Follows the
+        [MS Graph searchResponse](https://learn.microsoft.com/en-us/graph/api/resources/searchresponse)
+        resource type.
+      properties:
+        searchTerms:
+          type: array
+          description: Contains the search terms sent in the initial search query.
+          items:
+            type: string
+        hitsContainers:
+          type: array
+          description: |
+            A collection of search result sets. One for each entity type that
+            was queried.
+          items:
+            $ref: '#/components/schemas/searchHitsContainer'
+    searchHitsContainer:
+      type: object
+      description: |
+        Contains a collection of search results. Follows the
+        [MS Graph searchHitsContainer](https://learn.microsoft.com/en-us/graph/api/resources/searchhitscontainer)
+        resource type.
+      properties:
+        hits:
+          type: array
+          description: A collection of the search results.
+          items:
+            $ref: '#/components/schemas/searchHit'
+        total:
+          type: integer
+          format: int64
+          description: |
+            The total number of results. Note this is not the number of results
+            on the page, but the total number of results satisfying the query.
+          readOnly: true
+        moreResultsAvailable:
+          type: boolean
+          description: |
+            Provides information if more results are available. Based on this
+            information, you can adjust the `from` and `size` properties of the
+            `searchRequest` accordingly.
+          readOnly: true
+        aggregations:
+          type: array
+          description: |
+            Contains the collection of aggregations computed based on the
+            provided `aggregationOption` definitions in the request.
+          items:
+            $ref: '#/components/schemas/searchAggregation'
+    searchHit:
+      type: object
+      description: |
+        Represents an individual search result. Follows the
+        [MS Graph searchHit](https://learn.microsoft.com/en-us/graph/api/resources/searchhit)
+        resource type.
+      properties:
+        hitId:
+          type: string
+          description: The internal identifier for the item.
+          readOnly: true
+        rank:
+          type: integer
+          format: int32
+          description: The rank or the order of the result.
+          readOnly: true
+        summary:
+          type: string
+          description: |
+            A summary of the result, if a summary is available.
+          readOnly: true
+        resource:
+          $ref: '#/components/schemas/driveItem'
+    searchAggregation:
+      type: object
+      description: |
+        Provides the details of a search aggregation in the search response.
+        Follows the
+        [MS Graph searchAggregation](https://learn.microsoft.com/en-us/graph/api/resources/searchaggregation)
+        resource type.
+      properties:
+        field:
+          type: string
+          description: |
+            Defines the field in the request on which the aggregation was
+            computed.
+        buckets:
+          type: array
+          description: |
+            Defines the computed buckets for this aggregation. Buckets are
+            sorted according to the `sortBy` and `isDescending` specified in
+            the `bucketDefinition` of the corresponding `aggregationOption`.
+          items:
+            $ref: '#/components/schemas/searchBucket'
+        value:
+          type: number
+          format: double
+          description: |
+            Scalar result for metric aggregations (`metricKind` set on
+            the corresponding `aggregationOption`). Undefined for terms
+            or range aggregations. Libregraph extension not present in
+            MS Graph.
+        metricKind:
+          type: string
+          description: |
+            Echoes the `metricKind` of the corresponding
+            `aggregationOption`, allowing consumers (and the search
+            service's cross-space merge layer) to pick the right
+            reducer when combining results. Libregraph extension.
+          enum:
+            - sum
+            - min
+            - max
+            - avg
+    searchBucket:
+      type: object
+      description: |
+        Represents a single bucket in a search aggregation result. Follows the
+        [MS Graph searchBucket](https://learn.microsoft.com/en-us/graph/api/resources/searchbucket)
+        resource type.
+      properties:
+        key:
+          type: string
+          description: |
+            The discrete value of the field that was used to compute the
+            aggregation. For terms aggregations this is the field value. For
+            range aggregations this is a string representation of the range.
+        count:
+          type: integer
+          format: int64
+          description: |
+            The approximate number of search matches that share the same value
+            specified in the `key` property.
+        subAggregations:
+          type: array
+          description: |
+            Nested aggregation results, one per sub-aggregation requested
+            on the parent `aggregationOption`. Libregraph extension not
+            present in MS Graph.
+          items:
+            $ref: '#/components/schemas/searchAggregation'
     odata.error:
       required:
         - error
