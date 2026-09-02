@@ -5252,6 +5252,9 @@ components:
         '@libre.graph.livePhoto':
           description: Live Photo metadata, if the item is part of an Apple Live Photo. Read-only.
           $ref: '#/components/schemas/livePhoto'
+        lockInfo:
+          description: Lock metadata, if the file is locked. Read-only.
+          $ref: '#/components/schemas/lockInfo'
         '@client.synchronize':
           description: Indicates if the item is synchronized with the underlying storage provider. Read-only.
           type: boolean
@@ -5683,6 +5686,39 @@ components:
             Version of the algorithm that produced vitalityScore
             (com.apple.quicktime.live-photo.vitality-scoring-version). Only present on
             the video half. Read-only.
+          readOnly: true
+    lockInfo:
+      type: object
+      readOnly: true
+      description: |
+        Read-only lock metadata for a file, matching the MS Graph beta
+        lockInfo resource. Indicates whether the file is locked, the kind of
+        lock, when it was created, when it expires and who holds it.
+      properties:
+        lockType:
+          type: string
+          enum: [ none, exclusive ]
+          description: The type of lock currently held on the file. OpenCloud currently only issues exclusive locks, same as MS Graph, even if it defines more. Read-only.
+          readOnly: true
+        createdDateTime:
+          type: string
+          format: date-time
+          description: The date and time when the lock was created, in UTC. Read-only.
+          readOnly: true
+        expirationDateTime:
+          type: string
+          format: date-time
+          description: The date and time when the lock expires, in UTC. Read-only.
+          readOnly: true
+        owners:
+          type: array
+          items:
+            $ref: '#/components/schemas/identity'
+          description: The collection of users that currently hold the lock on the file. Read-only.
+          readOnly: true
+        '@libre.graph.appName':
+          type: string
+          description: Name of the application holding the lock, for example an office application. Not part of MS Graph. Read-only.
           readOnly: true
     geoCoordinates:
       type: object
