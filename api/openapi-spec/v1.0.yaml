@@ -6531,11 +6531,15 @@ components:
         items:
           enum:
             - children
+            - thumbnails
           type: string
       examples:
         request children:
           value:
             - children
+        request thumbnails:
+          value:
+            - thumbnails
     drivesFilter:
       name: $filter
       in: query
