@@ -6511,6 +6511,7 @@ components:
           enum:
             - '@microsoft.graph.downloadUrl'
             - '@libre.graph.permissions.actions.allowedValues'
+            - '@libre.graph.shareTypes'
           type: string
       examples:
         request download url:
@@ -6519,6 +6520,9 @@ components:
         request allowed actions:
           value:
             - '@libre.graph.permissions.actions.allowedValues'
+        request share types:
+          value:
+            - '@libre.graph.shareTypes'
     driveItemExpand:
       name: $expand
       in: query
