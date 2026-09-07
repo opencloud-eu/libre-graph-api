@@ -4560,9 +4560,10 @@ paths:
 
         The query string uses KQL (Keyword Query Language) syntax for filtering.
 
-        This endpoint is inspired by the
-        [MS Graph Search API](https://learn.microsoft.com/en-us/graph/api/search-query)
-        and follows the same request/response structure for compatibility.
+        Modeled on the MS Graph search query endpoint
+        (https://learn.microsoft.com/en-us/graph/api/search-query). Request and
+        response follow the MS Graph resource types; libregraph additions carry
+        the `@libre.graph.` prefix.
       requestBody:
         required: true
         content:
