@@ -6618,20 +6618,28 @@ components:
             aggregations.
           items:
             $ref: '#/components/schemas/aggregationOption'
-        '@libre.graph.metricKind':
+        '@libre.graph.metricDefinition':
+          $ref: '#/components/schemas/metricDefinition'
+    metricDefinition:
+      type: object
+      description: |
+        Provides the details of how to compute a scalar metric over the
+        aggregation `field`, the counterpart of `bucketDefinition` for
+        metric aggregations. When set on an `aggregationOption`, `size` and
+        `bucketDefinition` are ignored, and the corresponding
+        `searchAggregation` in the response carries a `@libre.graph.metric`
+        rather than `buckets`. Libregraph extension not present in MS Graph.
+      required:
+        - kind
+      properties:
+        kind:
           type: string
           description: |
-            When set, this aggregation is a scalar metric over `field`
-            rather than a bucket aggregation: `size` and
-            `bucketDefinition` are ignored, and the corresponding
-            `searchAggregation` in the response carries a
-            `@libre.graph.value` rather than `buckets`. Libregraph
-            extension not present in MS Graph.
+            The reducer applied to the field values of all matches. Required.
 
-            `avg` is not a simple reducer (averages of averages are
-            not averages): the backend carries `(sum, count)`
-            internally and emits only `@libre.graph.value` on the
-            outermost merge.
+            `avg` is not a simple reducer (averages of averages are not
+            averages): the backend carries `(sum, count)` internally and
+            emits only the final value on the outermost merge.
           enum:
             - sum
             - min
@@ -6804,26 +6812,31 @@ components:
             the `bucketDefinition` of the corresponding `aggregationOption`.
           items:
             $ref: '#/components/schemas/searchBucket'
-        '@libre.graph.value':
-          type: number
-          format: double
-          description: |
-            Scalar result for metric aggregations (`@libre.graph.metricKind`
-            set on the corresponding `aggregationOption`). Undefined for
-            terms or range aggregations. Libregraph extension not present in
-            MS Graph.
-        '@libre.graph.metricKind':
+        '@libre.graph.metric':
+          $ref: '#/components/schemas/searchMetric'
+    searchMetric:
+      type: object
+      description: |
+        The result of a metric aggregation, the counterpart of `buckets` for
+        aggregations requested with a `@libre.graph.metricDefinition`.
+        Absent for terms and range aggregations. Libregraph extension not
+        present in MS Graph.
+      properties:
+        kind:
           type: string
           description: |
-            Echoes the `@libre.graph.metricKind` of the corresponding
-            `aggregationOption`, allowing consumers (and the search
-            service's cross-space merge layer) to pick the right
-            reducer when combining results. Libregraph extension.
+            Echoes the `kind` of the corresponding `metricDefinition`,
+            allowing consumers (and the search service's cross-space merge
+            layer) to pick the right reducer when combining results.
           enum:
             - sum
             - min
             - max
             - avg
+        value:
+          type: number
+          format: double
+          description: The scalar result of the metric.
     searchBucket:
       type: object
       description: |
