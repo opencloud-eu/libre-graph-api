@@ -2640,7 +2640,8 @@ paths:
         instead of item id. OpenCloud defines `recyclebin`, which resolves to the drive's
         trash; the folder need not be reachable in the normal item tree. Use `.../children`
         to list its contents. The colon path form `special/{special-name}:/{path}` addresses
-        an item by path under the special folder. Modeled on MS Graph get special folder
+        an item by path under the special folder. `$expand=children` embeds the listing
+        in the response. Modeled on MS Graph get special folder
         (https://learn.microsoft.com/en-us/graph/api/drive-get-specialfolder).
       parameters:
         - name: drive-id
@@ -2662,6 +2663,7 @@ paths:
           example: recyclebin
           x-ms-docs-key-type: special
         - $ref: '#/components/parameters/driveItemSelect'
+        - $ref: '#/components/parameters/driveItemExpand'
       responses:
         '200':
           description: Retrieved special folder
