@@ -6606,7 +6606,7 @@ components:
           minimum: 1
         bucketDefinition:
           $ref: '#/components/schemas/bucketDefinition'
-        subAggregations:
+        '@libre.graph.subAggregations':
           type: array
           description: |
             Nested aggregations computed within each bucket of this
@@ -6618,19 +6618,20 @@ components:
             aggregations.
           items:
             $ref: '#/components/schemas/aggregationOption'
-        metricKind:
+        '@libre.graph.metricKind':
           type: string
           description: |
             When set, this aggregation is a scalar metric over `field`
             rather than a bucket aggregation: `size` and
             `bucketDefinition` are ignored, and the corresponding
-            `searchAggregation` in the response carries a `value`
-            rather than `buckets`. Libregraph extension not present in
-            MS Graph.
+            `searchAggregation` in the response carries a
+            `@libre.graph.value` rather than `buckets`. Libregraph
+            extension not present in MS Graph.
 
             `avg` is not a simple reducer (averages of averages are
             not averages): the backend carries `(sum, count)`
-            internally and emits only `value` on the outermost merge.
+            internally and emits only `@libre.graph.value` on the
+            outermost merge.
           enum:
             - sum
             - min
@@ -6803,18 +6804,18 @@ components:
             the `bucketDefinition` of the corresponding `aggregationOption`.
           items:
             $ref: '#/components/schemas/searchBucket'
-        value:
+        '@libre.graph.value':
           type: number
           format: double
           description: |
-            Scalar result for metric aggregations (`metricKind` set on
-            the corresponding `aggregationOption`). Undefined for terms
-            or range aggregations. Libregraph extension not present in
+            Scalar result for metric aggregations (`@libre.graph.metricKind`
+            set on the corresponding `aggregationOption`). Undefined for
+            terms or range aggregations. Libregraph extension not present in
             MS Graph.
-        metricKind:
+        '@libre.graph.metricKind':
           type: string
           description: |
-            Echoes the `metricKind` of the corresponding
+            Echoes the `@libre.graph.metricKind` of the corresponding
             `aggregationOption`, allowing consumers (and the search
             service's cross-space merge layer) to pick the right
             reducer when combining results. Libregraph extension.
@@ -6860,7 +6861,7 @@ components:
             with the bounds of the matching `bucketAggregationRange`; an open
             lower bound is written as `min`, an open upper bound as `max`.
             This is the same encoding MS Graph uses.
-        subAggregations:
+        '@libre.graph.subAggregations':
           type: array
           description: |
             Nested aggregation results, one per sub-aggregation requested
