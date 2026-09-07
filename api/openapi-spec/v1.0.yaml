@@ -6543,9 +6543,11 @@ components:
             the `aggregationFilterToken` of the wanted `searchBucket` and
             combine it with the field as `{field}:{aggregationFilterToken}`,
             e.g. `audio.artist:"ǂǂ50696e6b20466c6f7964"` for a terms bucket or
-            `audio.year:range(1980,1990)` for a range bucket. Several buckets
+            `audio.year:range(1980, 1990)` for a range bucket. Several buckets
             of the same field are combined with
             `{field}:or({aggregationFilterToken},{aggregationFilterToken})`.
+            Whitespace after the commas of `range(...)` and `or(...)` is
+            optional.
 
             Multiple filters can be provided as separate array items. This
             results in a logical AND between the filters. Filters that are
@@ -6870,10 +6872,12 @@ components:
             For terms buckets the token is the key encoded as lowercase hex of
             its UTF-8 bytes, prefixed with `ǂǂ` (U+01C2 twice) and wrapped in
             double quotes, e.g. `"ǂǂ50696e6b20466c6f7964"` for the key
-            `Pink Floyd`. For range buckets the token is `range({from},{to})`
+            `Pink Floyd`. For range buckets the token is `range({from}, {to})`
             with the bounds of the matching `bucketAggregationRange`; an open
-            lower bound is written as `min`, an open upper bound as `max`.
-            This is the same encoding MS Graph uses.
+            lower bound is written as `min`, an open upper bound as `max`
+            followed by `to="le"`, e.g. `range(min, 1980)`,
+            `range(1980, 1990)` and `range(2010, max, to="le")`. This is the
+            same encoding MS Graph uses.
         '@libre.graph.subAggregations':
           type: array
           description: |
