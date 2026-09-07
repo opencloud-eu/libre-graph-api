@@ -2629,6 +2629,102 @@ paths:
         default:
           $ref: '#/components/responses/error'
       x-ms-docs-operation-type: operation
+  '/v1.0/drives/{drive-id}/special/{special-name}':
+    get:
+      tags:
+        - driveItem
+      summary: Get a special folder of a drive
+      operationId: GetDriveSpecial
+      description: |
+        Get the driveItem for a special folder of the drive, addressed by well-known name
+        instead of item id. OpenCloud defines `recyclebin`, which resolves to the drive's
+        trash; the folder need not be reachable in the normal item tree. Use `.../children`
+        to list its contents. The colon path form `special/{special-name}:/{path}` addresses
+        an item by path under the special folder. Modeled on MS Graph get special folder
+        (https://learn.microsoft.com/en-us/graph/api/drive-get-specialfolder).
+      parameters:
+        - name: drive-id
+          in: path
+          description: 'key: id of drive'
+          required: true
+          schema:
+            type: string
+          example: a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668
+          x-ms-docs-key-type: drive
+        - name: special-name
+          in: path
+          description: 'key: well-known name of the special folder'
+          required: true
+          schema:
+            type: string
+            enum:
+              - recyclebin
+          example: recyclebin
+          x-ms-docs-key-type: special
+        - $ref: '#/components/parameters/driveItemSelect'
+      responses:
+        '200':
+          description: Retrieved special folder
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/driveItem'
+        default:
+          $ref: '#/components/responses/error'
+      x-ms-docs-operation-type: operation
+  '/v1.0/drives/{drive-id}/special/{special-name}/children':
+    get:
+      tags:
+        - driveItem
+      summary: List children of a special folder
+      operationId: ListDriveSpecialChildren
+      description: |
+        List the children of a special folder. For `recyclebin` this is the drive's trash:
+        each child is a driveItem carrying the `trash` facet (`trashedBy`, `trashedDateTime`)
+        and a `parentReference` for its original location. Trashed items are not reachable
+        through the normal item tree. The colon path form
+        `special/{special-name}:/{path}:/children` lists a subfolder; OpenAPI cannot express
+        the colon segment, so it is not a separate operation. Modeled on MS Graph list
+        children (https://learn.microsoft.com/en-us/graph/api/driveitem-list-children).
+      parameters:
+        - name: drive-id
+          in: path
+          description: 'key: id of drive'
+          required: true
+          schema:
+            type: string
+          example: a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668
+          x-ms-docs-key-type: drive
+        - name: special-name
+          in: path
+          description: 'key: well-known name of the special folder'
+          required: true
+          schema:
+            type: string
+            enum:
+              - recyclebin
+          example: recyclebin
+          x-ms-docs-key-type: special
+        - $ref: '#/components/parameters/driveItemSelect'
+      responses:
+        '200':
+          description: Retrieved resource list
+          content:
+            application/json:
+              schema:
+                title: Collection of driveItems
+                type: object
+                properties:
+                  value:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/driveItem'
+                    maxItems: 100
+                  '@odata.nextLink':
+                    type: string
+        default:
+          $ref: '#/components/responses/error'
+      x-ms-docs-operation-type: operation
   /v1.0/me/drive:
     get:
       tags:
