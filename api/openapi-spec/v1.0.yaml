@@ -4562,7 +4562,7 @@ paths:
 
         Modeled on the MS Graph search query endpoint
         (https://learn.microsoft.com/en-us/graph/api/search-query). Request and
-        response follow the MS Graph resource types; libregraph additions carry
+        response follow the MS Graph resource types; Libregraph additions carry
         the `@libre.graph.` prefix.
       parameters:
         - name: $expand
