@@ -1352,6 +1352,88 @@ paths:
         default:
           $ref: '#/components/responses/error'
       x-ms-docs-operation-type: operation
+  '/v1beta1/drives/{drive-id}/items/{item-id}/restore':
+    post:
+      tags:
+        - driveItem
+      summary: Restore a trashed DriveItem
+      operationId: RestoreDriveItemBeta
+      description: |
+        Restore a driveItem from the trash by using its ID. Optionally provide a
+        parentReference and name to restore it to a different location. Modeled on MS Graph
+        restore driveItem (https://learn.microsoft.com/en-us/graph/api/driveitem-restore).
+      parameters:
+        - name: drive-id
+          in: path
+          description: 'key: id of drive'
+          required: true
+          schema:
+            type: string
+          example: a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668
+          x-ms-docs-key-type: drive
+        - name: item-id
+          in: path
+          description: 'key: id of item'
+          required: true
+          schema:
+            type: string
+          example: a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668!item-id
+          x-ms-docs-key-type: item
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                parentReference:
+                  $ref: '#/components/schemas/itemReference'
+                name:
+                  type: string
+      responses:
+        '200':
+          description: Restored driveItem
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/driveItem'
+        default:
+          $ref: '#/components/responses/error'
+      x-ms-docs-operation-type: operation
+  '/v1beta1/drives/{drive-id}/items/{item-id}/permanentDelete':
+    post:
+      tags:
+        - driveItem
+      summary: Permanently delete a DriveItem
+      operationId: PermanentDeleteDriveItemBeta
+      description: |
+        Permanently delete a driveItem by using its ID, bypassing the trash. The item
+        cannot be restored. Applies to a live item; a trashed item is not addressable
+        through this endpoint. Modeled on MS Graph permanentDelete
+        (https://learn.microsoft.com/en-us/graph/api/driveitem-permanentdelete).
+      parameters:
+        - name: drive-id
+          in: path
+          description: 'key: id of drive'
+          required: true
+          schema:
+            type: string
+          example: a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668
+          x-ms-docs-key-type: drive
+        - name: item-id
+          in: path
+          description: 'key: id of item'
+          required: true
+          schema:
+            type: string
+          example: a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668!item-id
+          x-ms-docs-key-type: item
+      responses:
+        '204':
+          description: Permanently deleted
+        default:
+          $ref: '#/components/responses/error'
+      x-ms-docs-operation-type: operation
   '/v1beta1/drives/{drive-id}/items/{item-id}/children':
     post:
       tags:
@@ -2276,6 +2358,88 @@ paths:
         default:
           $ref: '#/components/responses/error'
       x-ms-docs-operation-type: operation
+  '/v1.0/drives/{drive-id}/items/{item-id}/restore':
+    post:
+      tags:
+        - driveItem
+      summary: Restore a trashed DriveItem
+      operationId: RestoreDriveItemV1
+      description: |
+        Restore a driveItem from the trash by using its ID. Optionally provide a
+        parentReference and name to restore it to a different location. Modeled on MS Graph
+        restore driveItem (https://learn.microsoft.com/en-us/graph/api/driveitem-restore).
+      parameters:
+        - name: drive-id
+          in: path
+          description: 'key: id of drive'
+          required: true
+          schema:
+            type: string
+          example: a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668
+          x-ms-docs-key-type: drive
+        - name: item-id
+          in: path
+          description: 'key: id of item'
+          required: true
+          schema:
+            type: string
+          example: a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668!item-id
+          x-ms-docs-key-type: item
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                parentReference:
+                  $ref: '#/components/schemas/itemReference'
+                name:
+                  type: string
+      responses:
+        '200':
+          description: Restored driveItem
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/driveItem'
+        default:
+          $ref: '#/components/responses/error'
+      x-ms-docs-operation-type: operation
+  '/v1.0/drives/{drive-id}/items/{item-id}/permanentDelete':
+    post:
+      tags:
+        - driveItem
+      summary: Permanently delete a DriveItem
+      operationId: PermanentDeleteDriveItemV1
+      description: |
+        Permanently delete a driveItem by using its ID, bypassing the trash. The item
+        cannot be restored. Applies to a live item; a trashed item is not addressable
+        through this endpoint. Modeled on MS Graph permanentDelete
+        (https://learn.microsoft.com/en-us/graph/api/driveitem-permanentdelete).
+      parameters:
+        - name: drive-id
+          in: path
+          description: 'key: id of drive'
+          required: true
+          schema:
+            type: string
+          example: a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668
+          x-ms-docs-key-type: drive
+        - name: item-id
+          in: path
+          description: 'key: id of item'
+          required: true
+          schema:
+            type: string
+          example: a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668!item-id
+          x-ms-docs-key-type: item
+      responses:
+        '204':
+          description: Permanently deleted
+        default:
+          $ref: '#/components/responses/error'
+      x-ms-docs-operation-type: operation
   '/v1.0/drives/{drive-id}/items/{item-id}/children':
     get:
       tags:
@@ -2629,6 +2793,183 @@ paths:
         default:
           $ref: '#/components/responses/error'
       x-ms-docs-operation-type: operation
+  '/v1.0/drives/{drive-id}/special/{special-name}':
+    get:
+      tags:
+        - driveItem
+      summary: Get a special folder of a drive
+      operationId: GetDriveSpecial
+      description: |
+        Get the driveItem for a special folder of the drive, addressed by well-known name
+        instead of item id. OpenCloud defines `recyclebin`, which resolves to the drive's
+        trash; the folder need not be reachable in the normal item tree. Use `.../children`
+        to list its contents. The colon path form `special/{special-name}:/{path}` addresses
+        an item by path under the special folder. `$expand=children` embeds the listing
+        in the response. Modeled on MS Graph get special folder
+        (https://learn.microsoft.com/en-us/graph/api/drive-get-specialfolder).
+      parameters:
+        - name: drive-id
+          in: path
+          description: 'key: id of drive'
+          required: true
+          schema:
+            type: string
+          example: a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668
+          x-ms-docs-key-type: drive
+        - name: special-name
+          in: path
+          description: 'key: well-known name of the special folder'
+          required: true
+          schema:
+            type: string
+            enum:
+              - recyclebin
+          example: recyclebin
+          x-ms-docs-key-type: special
+        - $ref: '#/components/parameters/driveItemSelect'
+        - $ref: '#/components/parameters/driveItemExpand'
+      responses:
+        '200':
+          description: Retrieved special folder
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/driveItem'
+        default:
+          $ref: '#/components/responses/error'
+      x-ms-docs-operation-type: operation
+    delete:
+      tags:
+        - driveItem
+      summary: Empty a special folder
+      operationId: EmptyDriveSpecial
+      description: |
+        Empty a special folder. For `recyclebin` this purges all trashed items from the
+        drive's trash; they cannot be restored afterwards. The special folder itself is
+        virtual and stays addressable (now empty). No MS Graph equivalent; it mirrors the
+        WebDAV empty-trash (DELETE on the trash-bin root).
+      parameters:
+        - name: drive-id
+          in: path
+          description: 'key: id of drive'
+          required: true
+          schema:
+            type: string
+          example: a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668
+          x-ms-docs-key-type: drive
+        - name: special-name
+          in: path
+          description: 'key: well-known name of the special folder'
+          required: true
+          schema:
+            type: string
+            enum:
+              - recyclebin
+          example: recyclebin
+          x-ms-docs-key-type: special
+      responses:
+        '204':
+          description: Emptied
+        default:
+          $ref: '#/components/responses/error'
+      x-ms-docs-operation-type: operation
+  '/v1.0/drives/{drive-id}/special/{special-name}/children':
+    get:
+      tags:
+        - driveItem
+      summary: List children of a special folder
+      operationId: ListDriveSpecialChildren
+      description: |
+        List the children of a special folder. For `recyclebin` this is the drive's trash:
+        each child is a driveItem carrying the `trash` facet (`trashedBy`, `trashedDateTime`)
+        and a `parentReference` for its original location. Trashed items are not reachable
+        through the normal item tree. The colon path form
+        `special/{special-name}:/{path}:/children` lists a subfolder; OpenAPI cannot express
+        the colon segment, so it is not a separate operation. Modeled on MS Graph list
+        children (https://learn.microsoft.com/en-us/graph/api/driveitem-list-children).
+      parameters:
+        - name: drive-id
+          in: path
+          description: 'key: id of drive'
+          required: true
+          schema:
+            type: string
+          example: a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668
+          x-ms-docs-key-type: drive
+        - name: special-name
+          in: path
+          description: 'key: well-known name of the special folder'
+          required: true
+          schema:
+            type: string
+            enum:
+              - recyclebin
+          example: recyclebin
+          x-ms-docs-key-type: special
+        - $ref: '#/components/parameters/driveItemSelect'
+      responses:
+        '200':
+          description: Retrieved resource list
+          content:
+            application/json:
+              schema:
+                title: Collection of driveItems
+                type: object
+                properties:
+                  value:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/driveItem'
+                    maxItems: 100
+                  '@odata.nextLink':
+                    type: string
+        default:
+          $ref: '#/components/responses/error'
+      x-ms-docs-operation-type: operation
+  '/v1.0/drives/{drive-id}/special/{special-name}/items/{item-id}':
+    delete:
+      tags:
+        - driveItem
+      summary: Permanently delete a trashed item from a special folder
+      operationId: DeleteDriveSpecialItem
+      description: |
+        Permanently remove a single item from a special folder. For `recyclebin` this
+        purges the trashed item from the drive's trash; it cannot be restored afterwards.
+        Modeled on MS Graph delete recycleBinItem
+        (https://learn.microsoft.com/en-us/graph/api/filestoragecontainer-delete-recyclebinitem).
+      parameters:
+        - name: drive-id
+          in: path
+          description: 'key: id of drive'
+          required: true
+          schema:
+            type: string
+          example: a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668
+          x-ms-docs-key-type: drive
+        - name: special-name
+          in: path
+          description: 'key: well-known name of the special folder'
+          required: true
+          schema:
+            type: string
+            enum:
+              - recyclebin
+          example: recyclebin
+          x-ms-docs-key-type: special
+        - name: item-id
+          in: path
+          description: 'key: id of item'
+          required: true
+          schema:
+            type: string
+          example: a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668!item-id
+          x-ms-docs-key-type: item
+      responses:
+        '204':
+          description: Purged
+        default:
+          $ref: '#/components/responses/error'
+      x-ms-docs-operation-type: operation
   /v1.0/me/drive:
     get:
       tags:
@@ -2753,6 +3094,72 @@ paths:
                           - user:
                               id: "48016357-346a-443e-bf7a-945c9448a99b"
                               displayName: "Marie Curie"
+        default:
+          $ref: '#/components/responses/error'
+      x-ms-docs-operation-type: operation
+  '/v1.0/me/drive/items/{item-id}/restore':
+    post:
+      tags:
+        - driveItem
+      summary: Restore a trashed DriveItem
+      operationId: RestoreMeDriveItem
+      description: |
+        Restore a driveItem from the trash by using its ID. Optionally provide a
+        parentReference and name to restore it to a different location. Modeled on MS Graph
+        restore driveItem (https://learn.microsoft.com/en-us/graph/api/driveitem-restore).
+      parameters:
+        - name: item-id
+          in: path
+          description: 'key: id of item'
+          required: true
+          schema:
+            type: string
+          example: a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668!item-id
+          x-ms-docs-key-type: item
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                parentReference:
+                  $ref: '#/components/schemas/itemReference'
+                name:
+                  type: string
+      responses:
+        '200':
+          description: Restored driveItem
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/driveItem'
+        default:
+          $ref: '#/components/responses/error'
+      x-ms-docs-operation-type: operation
+  '/v1.0/me/drive/items/{item-id}/permanentDelete':
+    post:
+      tags:
+        - driveItem
+      summary: Permanently delete a DriveItem
+      operationId: PermanentDeleteMeDriveItem
+      description: |
+        Permanently delete a driveItem by using its ID, bypassing the trash. The item
+        cannot be restored. Applies to a live item; a trashed item is not addressable
+        through this endpoint. Modeled on MS Graph permanentDelete
+        (https://learn.microsoft.com/en-us/graph/api/driveitem-permanentdelete).
+      parameters:
+        - name: item-id
+          in: path
+          description: 'key: id of item'
+          required: true
+          schema:
+            type: string
+          example: a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668!item-id
+          x-ms-docs-key-type: item
+      responses:
+        '204':
+          description: Permanently deleted
         default:
           $ref: '#/components/responses/error'
       x-ms-docs-operation-type: operation
