@@ -4676,7 +4676,30 @@ paths:
                     items:
                       $ref: '#/components/schemas/searchResponse'
               examples:
-                search results with aggregations:
+                search with aggregations:
+                  summary: Facet counts for the size:0 request (no hits, only the buckets and their filter tokens)
+                  value:
+                    value:
+                      - searchTerms:
+                          - "mediatype:audio"
+                        hitsContainers:
+                          - hits: []
+                            total: 142
+                            moreResultsAvailable: true
+                            aggregations:
+                              - field: audio.artist
+                                buckets:
+                                  - key: Saxon
+                                    count: 42
+                                    aggregationFilterToken: "\"ǂǂ5361786f6e\""
+                                  - key: Iron Maiden
+                                    count: 35
+                                    aggregationFilterToken: "\"ǂǂ49726f6e204d616964656e\""
+                                  - key: Judas Priest
+                                    count: 28
+                                    aggregationFilterToken: "\"ǂǂ4a7564617320507269657374\""
+                search with aggregation filter:
+                  summary: Drilldown with the Saxon bucket's aggregationFilterToken from the previous response; total equals that bucket's count
                   value:
                     value:
                       - searchTerms:
@@ -4697,20 +4720,8 @@ paths:
                                     track: 1
                                     disc: 1
                                     duration: 235000
-                            total: 142
+                            total: 42
                             moreResultsAvailable: true
-                            aggregations:
-                              - field: audio.artist
-                                buckets:
-                                  - key: Saxon
-                                    count: 42
-                                    aggregationFilterToken: "\"ǂǂ5361786f6e\""
-                                  - key: Iron Maiden
-                                    count: 35
-                                    aggregationFilterToken: "\"ǂǂ49726f6e204d616964656e\""
-                                  - key: Judas Priest
-                                    count: 28
-                                    aggregationFilterToken: "\"ǂǂ4a7564617320507269657374\""
         default:
           $ref: '#/components/responses/error'
 components:
