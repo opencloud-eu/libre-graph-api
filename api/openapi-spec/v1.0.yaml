@@ -2331,6 +2331,240 @@ paths:
         default:
           $ref: '#/components/responses/error'
       x-ms-docs-operation-type: operation
+  '/v1.0/drives/{drive-id}/items/{item-id}/versions':
+    get:
+      tags:
+        - driveItem
+      summary: List versions of a DriveItem
+      operationId: ListDriveItemVersions
+      description: |
+        List the versions of the file identified by `item-id` in the drive
+        identified by `drive-id`. Only driveItem objects with a `file` facet
+        have versions.
+
+        Versions are returned in descending order, the most recent version
+        first. Like MS Graph, this endpoint does not support the `$orderby`,
+        `$filter`, `$top` or `$skip` query parameters and the collection is
+        not paginated. The current version of the file is not part of the
+        collection. Use the driveItem itself for the current content and
+        metadata.
+
+        Modeled on the MS Graph list driveItem versions endpoint
+        (https://learn.microsoft.com/en-us/graph/api/driveitem-list-versions).
+      parameters:
+        - name: drive-id
+          in: path
+          description: 'key: id of drive'
+          required: true
+          schema:
+            type: string
+          example: a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668
+          x-ms-docs-key-type: drive
+        - name: item-id
+          in: path
+          description: 'key: id of item'
+          required: true
+          schema:
+            type: string
+          example: a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668!item-id
+          x-ms-docs-key-type: item
+        - $ref: '#/components/parameters/driveItemVersionSelect'
+      responses:
+        '200':
+          description: Retrieved resource list
+          content:
+            application/json:
+              schema:
+                title: Collection of driveItemVersions
+                type: object
+                properties:
+                  value:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/driveItemVersion'
+        '404':
+          description: The driveItem was not found or is not a file.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/odata.error'
+        default:
+          $ref: '#/components/responses/error'
+      x-ms-docs-operation-type: operation
+  '/v1.0/drives/{drive-id}/items/{item-id}/versions/{version-id}':
+    get:
+      tags:
+        - driveItem
+      summary: Get a version of a DriveItem
+      operationId: GetDriveItemVersion
+      description: |
+        Get the metadata of a single version of the file identified by
+        `item-id` in the drive identified by `drive-id`.
+
+        Modeled on the MS Graph get driveItemVersion endpoint
+        (https://learn.microsoft.com/en-us/graph/api/driveitemversion-get).
+      parameters:
+        - name: drive-id
+          in: path
+          description: 'key: id of drive'
+          required: true
+          schema:
+            type: string
+          example: a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668
+          x-ms-docs-key-type: drive
+        - name: item-id
+          in: path
+          description: 'key: id of item'
+          required: true
+          schema:
+            type: string
+          example: a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668!item-id
+          x-ms-docs-key-type: item
+        - name: version-id
+          in: path
+          description: |
+            key: id of version. Like MS Graph, the special value `current`
+            addresses the current version of the file.
+          required: true
+          schema:
+            type: string
+          example: a0ca6a90-a365-4782-871e-d44447bbc668.REV.2026-09-07T10:15:30.123456789Z
+          x-ms-docs-key-type: driveItemVersion
+        - $ref: '#/components/parameters/driveItemVersionSelect'
+      responses:
+        '200':
+          description: Retrieved driveItemVersion
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/driveItemVersion'
+        '404':
+          description: The driveItem or the version was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/odata.error'
+        default:
+          $ref: '#/components/responses/error'
+      x-ms-docs-operation-type: operation
+  '/v1.0/drives/{drive-id}/items/{item-id}/versions/{version-id}/content':
+    get:
+      tags:
+        - driveItem
+      summary: Download the content of a DriveItem version
+      operationId: GetDriveItemVersionContent
+      description: |
+        Download the content of a specific version of the file identified by
+        `item-id` in the drive identified by `drive-id`.
+
+        Like the `/content` endpoint of the driveItem itself, the response is
+        a `302 Found` redirecting to a pre-authenticated, short-lived download
+        URL for the version. The redirect target does not require an
+        `Authorization` header. To download a partial range of bytes, apply
+        the `Range` header to the redirect target, not to the `/content`
+        request.
+
+        Modeled on the MS Graph get driveItemVersion content endpoint
+        (https://learn.microsoft.com/en-us/graph/api/driveitemversion-get-contents).
+      parameters:
+        - name: drive-id
+          in: path
+          description: 'key: id of drive'
+          required: true
+          schema:
+            type: string
+          x-ms-docs-key-type: drive
+        - name: item-id
+          in: path
+          description: 'key: id of item'
+          required: true
+          schema:
+            type: string
+          x-ms-docs-key-type: item
+        - name: version-id
+          in: path
+          description: 'key: id of version'
+          required: true
+          schema:
+            type: string
+          x-ms-docs-key-type: driveItemVersion
+      responses:
+        '302':
+          description: Pre-authenticated redirect to the version content.
+          headers:
+            Location:
+              required: true
+              schema:
+                type: string
+                format: uri
+              description: The pre-authenticated URL where the version content can be downloaded.
+        '404':
+          description: The driveItem or the version was not found, or the driveItem is not a file.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/odata.error'
+        default:
+          $ref: '#/components/responses/error'
+      x-ms-docs-operation-type: operation
+  '/v1.0/drives/{drive-id}/items/{item-id}/versions/{version-id}/restoreVersion':
+    post:
+      tags:
+        - driveItem
+      summary: Restore a version of a DriveItem
+      operationId: RestoreDriveItemVersion
+      description: |
+        Restore a previous version of the file identified by `item-id` in the
+        drive identified by `drive-id`. The content of the version becomes the
+        current content of the file. The previously current content is kept as
+        a new version, so restoring never discards data. The restored version
+        itself is removed from the versions collection since it is now the
+        current version of the file.
+
+        The request has no body.
+
+        Modeled on the MS Graph restore driveItemVersion endpoint
+        (https://learn.microsoft.com/en-us/graph/api/driveitemversion-restore).
+      parameters:
+        - name: drive-id
+          in: path
+          description: 'key: id of drive'
+          required: true
+          schema:
+            type: string
+          x-ms-docs-key-type: drive
+        - name: item-id
+          in: path
+          description: 'key: id of item'
+          required: true
+          schema:
+            type: string
+          x-ms-docs-key-type: item
+        - name: version-id
+          in: path
+          description: 'key: id of version'
+          required: true
+          schema:
+            type: string
+          x-ms-docs-key-type: driveItemVersion
+      responses:
+        '204':
+          description: The version was restored.
+        '404':
+          description: The driveItem or the version was not found, or the driveItem is not a file.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/odata.error'
+        '423':
+          description: The driveItem is locked and cannot be restored.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/odata.error'
+        default:
+          $ref: '#/components/responses/error'
+      x-ms-docs-operation-type: action
   /v1.0/groups:
     get:
       tags:
@@ -5317,6 +5551,54 @@ components:
               - link
               - remote
           readOnly: true
+    driveItemVersion:
+      type: object
+      readOnly: true
+      description: |
+        Represents a specific version of a driveItem. Read-only.
+
+        Modeled on the MS Graph driveItemVersion resource
+        (https://learn.microsoft.com/en-us/graph/api/resources/driveitemversion).
+        The `publication` facet is not supported, OpenCloud has no
+        checkout / publish workflow.
+      properties:
+        id:
+          type: string
+          description: The ID of the version. Read-only.
+          readOnly: true
+        lastModifiedBy:
+          $ref: '#/components/schemas/identitySet'
+          description: |
+            Identity of the user which last modified the version. Read-only.
+            OpenCloud does not record who created a version, so this property
+            is currently omitted.
+          readOnly: true
+        lastModifiedDateTime:
+          pattern: '^[0-9]{4,}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])[Tt]([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]([.][0-9]{1,12})?([Zz]|[+-][0-9][0-9]:[0-9][0-9])$'
+          type: string
+          description: Date and time the version was last modified. Read-only.
+          format: date-time
+          readOnly: true
+        size:
+          type: integer
+          description: Size of the version content in bytes. Read-only.
+          format: int64
+          readOnly: true
+        content:
+          type: string
+          description: 'The content stream of this version. Use the `/content` endpoint of the version to download it.'
+          format: base64url
+          readOnly: true
+        '@microsoft.graph.downloadUrl':
+          description: |
+            A pre-authenticated URL that can be used to download the content of
+            this version without providing an Authorization header. The URL is
+            short-lived and cannot be cached.
+
+            This annotation is only populated when explicitly requested via
+            `$select`, matching the behaviour of the annotation on the driveItem.
+          type: string
+          readOnly: true
     sharingLinkType:
       type: string
       enum: [ internal, view, upload, edit, createOnly, blocksDownload ]
@@ -6544,6 +6826,23 @@ components:
         request thumbnails:
           value:
             - thumbnails
+    driveItemVersionSelect:
+      name: $select
+      in: query
+      description: Select additional properties to be returned.
+      style: form
+      explode: false
+      schema:
+        uniqueItems: true
+        type: array
+        items:
+          enum:
+            - '@microsoft.graph.downloadUrl'
+          type: string
+      examples:
+        request download url:
+          value:
+            - '@microsoft.graph.downloadUrl'
     drivesFilter:
       name: $filter
       in: query
