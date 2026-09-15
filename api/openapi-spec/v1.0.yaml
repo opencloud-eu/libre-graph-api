@@ -5445,6 +5445,7 @@ components:
         location:
           description: Location metadata, if the item has location data. Read-only.
           $ref: '#/components/schemas/geoCoordinates'
+          readOnly: true
         thumbnails:
           description: Collection containing ThumbnailSet objects associated with the item. Read-only. Nullable.
           type: array
@@ -5967,7 +5968,6 @@ components:
           readOnly: true
     geoCoordinates:
       type: object
-      readOnly: true
       description: |
         The GeoCoordinates resource provides geographic coordinates and elevation of a location based on metadata contained within the file.
         If a DriveItem has a non-null location facet, the item represents a file with a known location associated with it.
