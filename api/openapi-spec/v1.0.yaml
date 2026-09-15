@@ -5428,20 +5428,26 @@ components:
           readOnly: true
         deleted:
           $ref: '#/components/schemas/deleted'
+          readOnly: true
         pendingOperations:
           description: Present while operations affecting the item's content have not completed. Read-only.
           $ref: '#/components/schemas/pendingOperations'
+          readOnly: true
         file:
           $ref: '#/components/schemas/openGraphFile'
+          readOnly: true
         fileSystemInfo:
           $ref: '#/components/schemas/fileSystemInfo'
         folder:
           $ref: '#/components/schemas/folder'
+          readOnly: true
         image:
           $ref: '#/components/schemas/image'
+          readOnly: true
         photo:
           description: Photo metadata, if the item is a photo. Read-only.
           $ref: '#/components/schemas/photo'
+          readOnly: true
         location:
           description: Location metadata, if the item has location data. Read-only.
           $ref: '#/components/schemas/geoCoordinates'
@@ -5457,6 +5463,7 @@ components:
           $ref: '#/components/schemas/trash'
         specialFolder:
           $ref: '#/components/schemas/specialFolder'
+          readOnly: true
         remoteItem:
           $ref: '#/components/schemas/remoteItem'
         size:
@@ -5489,12 +5496,15 @@ components:
         '@libre.graph.motionPhoto':
           description: Motion Photo metadata, if the item is a Motion Photo. Read-only.
           $ref: '#/components/schemas/motionPhoto'
+          readOnly: true
         '@libre.graph.livePhoto':
           description: Live Photo metadata, if the item is part of an Apple Live Photo. Read-only.
           $ref: '#/components/schemas/livePhoto'
+          readOnly: true
         lockInfo:
           description: Lock metadata, if the file is locked. Read-only.
           $ref: '#/components/schemas/lockInfo'
+          readOnly: true
         '@client.synchronize':
           description: Indicates if the item is synchronized with the underlying storage provider. Read-only.
           type: boolean
@@ -5708,7 +5718,6 @@ components:
     deleted:
       type: object
       description: Information about the deleted state of the item. Read-only.
-      readOnly: true
       properties:
         state:
           type: string
@@ -5716,7 +5725,6 @@ components:
     openGraphFile:
       type: object
       description: 'File metadata, if the item is a file. Read-only.'
-      readOnly: true
       properties:
         hashes:
           $ref: '#/components/schemas/hashes'
@@ -5748,7 +5756,6 @@ components:
     folder:
       type: object
       description: 'Folder metadata, if the item is a folder. Read-only.'
-      readOnly: true
       properties:
         childCount:
           maximum: 2147483647
@@ -5760,7 +5767,6 @@ components:
     image:
       type: object
       description: 'Image metadata, if the item is an image. Read-only.'
-      readOnly: true
       properties:
         height:
           maximum: 2147483647
@@ -5776,7 +5782,6 @@ components:
           readOnly: true
     photo:
       type: object
-      readOnly: true
       description: |
         The photo resource provides photo and camera properties, for example, EXIF metadata, on a driveItem.
       properties:
@@ -5817,7 +5822,6 @@ components:
           description: Represents the date and time the photo was taken. Read-only.
     pendingOperations:
       type: object
-      readOnly: true
       description: |
         Present while operations affecting the item's content have not
         completed, whether still queued or already running. While present,
@@ -5840,7 +5844,6 @@ components:
               readOnly: true
     motionPhoto:
       type: object
-      readOnly: true
       description: |
         Motion Photo metadata. A Motion Photo is a still image with a short video clip appended to
         the end of the file. The presence of this facet on a driveItem indicates that the item is
@@ -5872,7 +5875,6 @@ components:
           readOnly: true
     livePhoto:
       type: object
-      readOnly: true
       description: |
         Apple Live Photo metadata. A Live Photo is a pair of files sharing one content
         identifier: a still image (HEIC or JPEG) and a short QuickTime video. Unlike a
@@ -5935,7 +5937,6 @@ components:
           readOnly: true
     lockInfo:
       type: object
-      readOnly: true
       description: |
         Read-only lock metadata for a file, matching the MS Graph beta
         lockInfo resource. Indicates whether the file is locked, the kind of
@@ -6050,7 +6051,6 @@ components:
     specialFolder:
       type: object
       description: 'If the current item is also available as a special folder, this facet is returned. Read-only'
-      readOnly: true
       properties:
         name:
           type: string
@@ -6069,10 +6069,12 @@ components:
           format: date-time
         file:
           $ref: '#/components/schemas/openGraphFile'
+          readOnly: true
         fileSystemInfo:
           $ref: '#/components/schemas/fileSystemInfo'
         folder:
           $ref: '#/components/schemas/folder'
+          readOnly: true
         driveAlias:
           type: string
           description: "The drive alias can be used in clients to make the urls user friendly. Example: 'personal/einstein'. This will be used to resolve to the correct driveID."
@@ -6090,6 +6092,7 @@ components:
           description: Unique identifier for the remote item in its drive. Read-only.
         image:
           $ref: '#/components/schemas/image'
+          readOnly: true
         lastModifiedBy:
           $ref: '#/components/schemas/identitySet'
         lastModifiedDateTime:
@@ -6122,6 +6125,7 @@ components:
           format: int64
         specialFolder:
           $ref: '#/components/schemas/specialFolder'
+          readOnly: true
         webDavUrl:
           type: string
           description: DAV compatible URL for the item.
