@@ -2217,6 +2217,231 @@ paths:
         default:
           $ref: '#/components/responses/error'
       x-ms-docs-operation-type: operation
+  '/v1beta1/drives/{drive-id}/items/{item-id}/extensions':
+    get:
+      tags:
+        - driveItem.extensions
+      summary: List all extensions on a DriveItem
+      operationId: ListExtensions
+      description: |
+        Get the collection of open extensions on the specified DriveItem.
+
+        Each extension is identified by its `extensionName`, which follows a reverse DNS naming convention
+        (e.g. `com.example.myApp`).
+      parameters:
+        - name: drive-id
+          in: path
+          description: "key: id of drive"
+          required: true
+          schema:
+            type: string
+          example: a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668
+          x-ms-docs-key-type: drive
+        - name: item-id
+          in: path
+          description: "key: id of item"
+          required: true
+          schema:
+            type: string
+          example: a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668!share-id
+          x-ms-docs-key-type: item
+      responses:
+        '200':
+          description: Retrieved extensions
+          content:
+            application/json:
+              schema:
+                title: Collection of openTypeExtensions
+                type: object
+                properties:
+                  value:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/openTypeExtension'
+              examples:
+                list extensions:
+                  value:
+                    value:
+                      - extensionName: "com.example.project"
+                        status: "reviewed"
+                        assignee: "alice"
+                      - extensionName: "eu.opencloud.workflow"
+                        step: "approval"
+        default:
+          $ref: '#/components/responses/error'
+      x-ms-docs-operation-type: operation
+  '/v1beta1/drives/{drive-id}/items/{item-id}/extensions/{extension-name}':
+    get:
+      tags:
+        - driveItem.extensions
+      summary: Get an extension by name
+      operationId: GetExtension
+      description: |
+        Get a specific open extension identified by the extension name.
+      parameters:
+        - name: drive-id
+          in: path
+          description: "key: id of drive"
+          required: true
+          schema:
+            type: string
+          example: a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668
+          x-ms-docs-key-type: drive
+        - name: item-id
+          in: path
+          description: "key: id of item"
+          required: true
+          schema:
+            type: string
+          example: a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668!share-id
+          x-ms-docs-key-type: item
+        - name: extension-name
+          in: path
+          description: "The unique name of the extension, using reverse DNS notation (e.g. com.example.myApp)"
+          required: true
+          schema:
+            type: string
+          example: com.example.project
+      responses:
+        '200':
+          description: Retrieved extension
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/openTypeExtension'
+              examples:
+                get extension:
+                  value:
+                    extensionName: "com.example.project"
+                    status: "reviewed"
+                    assignee: "alice"
+                    priority: 3
+        '404':
+          $ref: '#/components/responses/error'
+        default:
+          $ref: '#/components/responses/error'
+      x-ms-docs-operation-type: operation
+    put:
+      tags:
+        - driveItem.extensions
+      summary: Create or update an extension
+      operationId: UpsertExtension
+      description: |
+        Create or update an open extension on the specified DriveItem.
+
+        If the extension does not exist, it is created. If it already exists, the provided properties
+        are merged with the existing data:
+
+        * Properties included in the request body are added or updated.
+        * Properties set to `null` are removed from the extension.
+        * Properties not included in the request body remain unchanged.
+
+        The extension name should follow reverse DNS naming conventions (e.g. `com.example.myApp`)
+        to avoid collisions between applications.
+      parameters:
+        - name: drive-id
+          in: path
+          description: "key: id of drive"
+          required: true
+          schema:
+            type: string
+          example: a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668
+          x-ms-docs-key-type: drive
+        - name: item-id
+          in: path
+          description: "key: id of item"
+          required: true
+          schema:
+            type: string
+          example: a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668!share-id
+          x-ms-docs-key-type: item
+        - name: extension-name
+          in: path
+          description: "The unique name of the extension, using reverse DNS notation (e.g. com.example.myApp)"
+          required: true
+          schema:
+            type: string
+          example: com.example.project
+      requestBody:
+        description: |
+          Extension properties to set. Use `null` values to remove individual properties.
+
+          The `extensionName` is derived from the URL path parameter and must not be included
+          in the request body. If present, it will be ignored.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/openTypeExtensionUpdate'
+            examples:
+              create extension:
+                value:
+                  status: "reviewed"
+                  assignee: "alice"
+                  priority: 3
+              update single property:
+                value:
+                  status: "approved"
+              remove a property:
+                value:
+                  priority: null
+      responses:
+        '200':
+          description: Extension updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/openTypeExtension'
+        '201':
+          description: Extension created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/openTypeExtension'
+        default:
+          $ref: '#/components/responses/error'
+      x-ms-docs-operation-type: operation
+    delete:
+      tags:
+        - driveItem.extensions
+      summary: Delete an extension
+      operationId: DeleteExtension
+      description: |
+        Delete an open extension from the specified DriveItem.
+
+        This removes the extension and all its properties.
+      parameters:
+        - name: drive-id
+          in: path
+          description: "key: id of drive"
+          required: true
+          schema:
+            type: string
+          example: a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668
+          x-ms-docs-key-type: drive
+        - name: item-id
+          in: path
+          description: "key: id of item"
+          required: true
+          schema:
+            type: string
+          example: a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668!share-id
+          x-ms-docs-key-type: item
+        - name: extension-name
+          in: path
+          description: "The unique name of the extension, using reverse DNS notation (e.g. com.example.myApp)"
+          required: true
+          schema:
+            type: string
+          example: com.example.project
+      responses:
+        '204':
+          description: Extension deleted
+        '404':
+          $ref: '#/components/responses/error'
+        default:
+          $ref: '#/components/responses/error'
+      x-ms-docs-operation-type: operation
   '/v1.0/drives/{drive-id}/root':
     get:
       tags:
@@ -5203,23 +5428,30 @@ components:
           readOnly: true
         deleted:
           $ref: '#/components/schemas/deleted'
+          readOnly: true
         pendingOperations:
           description: Present while operations affecting the item's content have not completed. Read-only.
           $ref: '#/components/schemas/pendingOperations'
+          readOnly: true
         file:
           $ref: '#/components/schemas/openGraphFile'
+          readOnly: true
         fileSystemInfo:
           $ref: '#/components/schemas/fileSystemInfo'
         folder:
           $ref: '#/components/schemas/folder'
+          readOnly: true
         image:
           $ref: '#/components/schemas/image'
+          readOnly: true
         photo:
           description: Photo metadata, if the item is a photo. Read-only.
           $ref: '#/components/schemas/photo'
+          readOnly: true
         location:
           description: Location metadata, if the item has location data. Read-only.
           $ref: '#/components/schemas/geoCoordinates'
+          readOnly: true
         thumbnails:
           description: Collection containing ThumbnailSet objects associated with the item. Read-only. Nullable.
           type: array
@@ -5231,6 +5463,7 @@ components:
           $ref: '#/components/schemas/trash'
         specialFolder:
           $ref: '#/components/schemas/specialFolder'
+          readOnly: true
         remoteItem:
           $ref: '#/components/schemas/remoteItem'
         size:
@@ -5263,12 +5496,15 @@ components:
         '@libre.graph.motionPhoto':
           description: Motion Photo metadata, if the item is a Motion Photo. Read-only.
           $ref: '#/components/schemas/motionPhoto'
+          readOnly: true
         '@libre.graph.livePhoto':
           description: Live Photo metadata, if the item is part of an Apple Live Photo. Read-only.
           $ref: '#/components/schemas/livePhoto'
+          readOnly: true
         lockInfo:
           description: Lock metadata, if the file is locked. Read-only.
           $ref: '#/components/schemas/lockInfo'
+          readOnly: true
         '@client.synchronize':
           description: Indicates if the item is synchronized with the underlying storage provider. Read-only.
           type: boolean
@@ -5330,6 +5566,12 @@ components:
               - group
               - link
               - remote
+          readOnly: true
+        extensions:
+          description: The collection of open extensions defined for this DriveItem. Nullable. Returned only on `$expand`.
+          type: array
+          items:
+            $ref: '#/components/schemas/openTypeExtension'
           readOnly: true
     sharingLinkType:
       type: string
@@ -5476,7 +5718,6 @@ components:
     deleted:
       type: object
       description: Information about the deleted state of the item. Read-only.
-      readOnly: true
       properties:
         state:
           type: string
@@ -5484,7 +5725,6 @@ components:
     openGraphFile:
       type: object
       description: 'File metadata, if the item is a file. Read-only.'
-      readOnly: true
       properties:
         hashes:
           $ref: '#/components/schemas/hashes'
@@ -5516,7 +5756,6 @@ components:
     folder:
       type: object
       description: 'Folder metadata, if the item is a folder. Read-only.'
-      readOnly: true
       properties:
         childCount:
           maximum: 2147483647
@@ -5528,7 +5767,6 @@ components:
     image:
       type: object
       description: 'Image metadata, if the item is an image. Read-only.'
-      readOnly: true
       properties:
         height:
           maximum: 2147483647
@@ -5544,7 +5782,6 @@ components:
           readOnly: true
     photo:
       type: object
-      readOnly: true
       description: |
         The photo resource provides photo and camera properties, for example, EXIF metadata, on a driveItem.
       properties:
@@ -5585,7 +5822,6 @@ components:
           description: Represents the date and time the photo was taken. Read-only.
     pendingOperations:
       type: object
-      readOnly: true
       description: |
         Present while operations affecting the item's content have not
         completed, whether still queued or already running. While present,
@@ -5608,7 +5844,6 @@ components:
               readOnly: true
     motionPhoto:
       type: object
-      readOnly: true
       description: |
         Motion Photo metadata. A Motion Photo is a still image with a short video clip appended to
         the end of the file. The presence of this facet on a driveItem indicates that the item is
@@ -5640,7 +5875,6 @@ components:
           readOnly: true
     livePhoto:
       type: object
-      readOnly: true
       description: |
         Apple Live Photo metadata. A Live Photo is a pair of files sharing one content
         identifier: a still image (HEIC or JPEG) and a short QuickTime video. Unlike a
@@ -5703,7 +5937,6 @@ components:
           readOnly: true
     lockInfo:
       type: object
-      readOnly: true
       description: |
         Read-only lock metadata for a file, matching the MS Graph beta
         lockInfo resource. Indicates whether the file is locked, the kind of
@@ -5736,7 +5969,6 @@ components:
           readOnly: true
     geoCoordinates:
       type: object
-      readOnly: true
       description: |
         The GeoCoordinates resource provides geographic coordinates and elevation of a location based on metadata contained within the file.
         If a DriveItem has a non-null location facet, the item represents a file with a known location associated with it.
@@ -5819,7 +6051,6 @@ components:
     specialFolder:
       type: object
       description: 'If the current item is also available as a special folder, this facet is returned. Read-only'
-      readOnly: true
       properties:
         name:
           type: string
@@ -5838,10 +6069,12 @@ components:
           format: date-time
         file:
           $ref: '#/components/schemas/openGraphFile'
+          readOnly: true
         fileSystemInfo:
           $ref: '#/components/schemas/fileSystemInfo'
         folder:
           $ref: '#/components/schemas/folder'
+          readOnly: true
         driveAlias:
           type: string
           description: "The drive alias can be used in clients to make the urls user friendly. Example: 'personal/einstein'. This will be used to resolve to the correct driveID."
@@ -5859,6 +6092,7 @@ components:
           description: Unique identifier for the remote item in its drive. Read-only.
         image:
           $ref: '#/components/schemas/image'
+          readOnly: true
         lastModifiedBy:
           $ref: '#/components/schemas/identitySet'
         lastModifiedDateTime:
@@ -5891,6 +6125,7 @@ components:
           format: int64
         specialFolder:
           $ref: '#/components/schemas/specialFolder'
+          readOnly: true
         webDavUrl:
           type: string
           description: DAV compatible URL for the item.
@@ -6084,6 +6319,55 @@ components:
         password:
           type: string
           description: Password. It may require a password policy.
+    openTypeExtension:
+      type: object
+      description: |
+        An open extension on a DriveItem: untyped custom data, identified by
+        `extensionName` (reverse DNS, e.g. `com.example.myApp`, use a domain you control).
+
+        All other members are custom properties. Values are strings, numbers, booleans
+        or arrays of those. The only object allowed is a `geoCoordinates` object
+        annotated with `#microsoft.graph.geoCoordinates`. Values are stored and
+        returned as written.
+
+        A sibling member `<property>@odata.type` annotates the type. Search indexes a
+        property by its type: a date-time (RFC 3339 string) is indexed as a date only
+        with `#DateTimeOffset`, otherwise as a string. `#String`, `#Int64`, `#Double`,
+        `#Boolean` and `#Collection(...)` are inferred from the JSON value and optional.
+        A mismatch or an unannotated object is rejected with 400. Responses carry the
+        annotations that were stored with the values.
+      required:
+        - extensionName
+      properties:
+        extensionName:
+          type: string
+          description: The unique identifier of the extension, in reverse DNS notation.
+          readOnly: true
+      additionalProperties: true
+      example:
+        extensionName: "com.example.project"
+        status: "reviewed"
+        priority: 3
+        due: "2026-10-01T00:00:00Z"
+        "due@odata.type": "#DateTimeOffset"
+        site:
+          latitude: 52.5
+          longitude: 13.4
+        "site@odata.type": "#microsoft.graph.geoCoordinates"
+    openTypeExtensionUpdate:
+      type: object
+      description: |
+        Properties to set or remove on an open extension. Included properties are added
+        or updated, `null` removes a property and its annotation, omitted properties stay
+        unchanged. Annotations follow the rules of `openTypeExtension`; a property written
+        without one gets the type of its new value.
+      additionalProperties:
+        nullable: true
+      example:
+        status: "approved"
+        due: "2026-11-01T00:00:00Z"
+        "due@odata.type": "#DateTimeOffset"
+        priority: null
     audio:
       type: object
       description: |
@@ -6550,6 +6834,7 @@ components:
           enum:
             - children
             - thumbnails
+            - extensions
           type: string
       examples:
         request children:
@@ -6558,6 +6843,9 @@ components:
         request thumbnails:
           value:
             - thumbnails
+        request extensions:
+          value:
+            - extensions
     drivesFilter:
       name: $filter
       in: query
