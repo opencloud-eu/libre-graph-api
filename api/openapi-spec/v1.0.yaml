@@ -6318,38 +6318,51 @@ components:
     openTypeExtension:
       type: object
       description: |
-        Represents an open extension on a DriveItem, providing a flexible way to attach
-        untyped custom data to a resource.
+        An open extension on a DriveItem: untyped custom data, identified by
+        `extensionName` (reverse DNS, e.g. `com.example.myApp`, use a domain you control).
 
-        Extensions are identified by their `extensionName`, which should follow reverse DNS
-        naming conventions (e.g. `com.example.myApp`) to avoid collisions between applications.
+        All other members are custom properties. Values are strings, numbers, booleans,
+        arrays of those, or a `geoCoordinates` object; no nested objects. Values are
+        stored and returned as written.
+
+        A sibling member `<property>@odata.type` annotates the type. It is required for
+        `#DateTimeOffset` (RFC 3339 string) and `#microsoft.graph.geoCoordinates`, and
+        optional for `#String`, `#Int64`, `#Double`, `#Boolean` and `#Collection(...)`,
+        which are inferred from the JSON value. A mismatch is rejected with 400.
+        Responses always include the annotation.
       required:
         - extensionName
       properties:
         extensionName:
           type: string
-          description: |
-            The unique identifier of the extension. Use reverse DNS naming conventions
-            (e.g. `com.example.myApp`).
+          description: The unique identifier of the extension, in reverse DNS notation.
           readOnly: true
       additionalProperties: true
       example:
         extensionName: "com.example.project"
         status: "reviewed"
-        assignee: "alice"
+        "status@odata.type": "#String"
         priority: 3
+        "priority@odata.type": "#Int64"
+        due: "2026-10-01T00:00:00Z"
+        "due@odata.type": "#DateTimeOffset"
+        site:
+          latitude: 52.5
+          longitude: 13.4
+        "site@odata.type": "#microsoft.graph.geoCoordinates"
     openTypeExtensionUpdate:
       type: object
       description: |
-        Properties to set or remove on an open extension.
-
-        * Properties included in the request body are added or updated.
-        * Properties set to `null` are removed from the extension.
-        * Properties not included in the request body remain unchanged.
+        Properties to set or remove on an open extension. Included properties are added
+        or updated, `null` removes a property and its annotation, omitted properties stay
+        unchanged. Annotations follow the rules of `openTypeExtension`; a property written
+        without one gets the type of its new value.
       additionalProperties:
         nullable: true
       example:
         status: "approved"
+        due: "2026-11-01T00:00:00Z"
+        "due@odata.type": "#DateTimeOffset"
         priority: null
     audio:
       type: object
