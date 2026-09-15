@@ -6321,17 +6321,17 @@ components:
         An open extension on a DriveItem: untyped custom data, identified by
         `extensionName` (reverse DNS, e.g. `com.example.myApp`, use a domain you control).
 
-        All other members are custom properties. Values are strings, numbers, booleans,
-        arrays of those, or a `geoCoordinates` object; no nested objects. Values are
-        stored and returned as written.
+        All other members are custom properties. Values are strings, numbers, booleans
+        or arrays of those. The only object allowed is a `geoCoordinates` object
+        annotated with `#microsoft.graph.geoCoordinates`. Values are stored and
+        returned as written.
 
         A sibling member `<property>@odata.type` annotates the type. Search indexes a
-        property by its type, so a date-time (RFC 3339 string) needs `#DateTimeOffset`
-        and a `geoCoordinates` object needs `#microsoft.graph.geoCoordinates` to be
-        searchable as such; without the annotation they are indexed as a string and
-        not at all. `#String`, `#Int64`, `#Double`, `#Boolean` and `#Collection(...)`
-        are inferred from the JSON value and optional. A mismatch is rejected with 400.
-        Responses always include the annotation.
+        property by its type: a date-time (RFC 3339 string) is indexed as a date only
+        with `#DateTimeOffset`, otherwise as a string. `#String`, `#Int64`, `#Double`,
+        `#Boolean` and `#Collection(...)` are inferred from the JSON value and optional.
+        A mismatch or an unannotated object is rejected with 400. Responses always
+        include the annotation.
       required:
         - extensionName
       properties:
