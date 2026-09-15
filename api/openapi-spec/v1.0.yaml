@@ -6334,8 +6334,8 @@ components:
         property by its type: a date-time (RFC 3339 string) is indexed as a date only
         with `#DateTimeOffset`, otherwise as a string. `#String`, `#Int64`, `#Double`,
         `#Boolean` and `#Collection(...)` are inferred from the JSON value and optional.
-        A mismatch or an unannotated object is rejected with 400. Responses always
-        include the annotation.
+        A mismatch or an unannotated object is rejected with 400. Responses carry the
+        annotations that were stored with the values.
       required:
         - extensionName
       properties:
@@ -6347,9 +6347,7 @@ components:
       example:
         extensionName: "com.example.project"
         status: "reviewed"
-        "status@odata.type": "#String"
         priority: 3
-        "priority@odata.type": "#Int64"
         due: "2026-10-01T00:00:00Z"
         "due@odata.type": "#DateTimeOffset"
         site:
