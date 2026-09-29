@@ -193,6 +193,117 @@ paths:
                             name: "secret stuff"
         default:
           $ref: '#/components/responses/error'
+  '/v1beta1/extensions/org.libregraph/guestInvitations/redeem':
+    post:
+      tags:
+        - guestInvitations
+      summary: Redeem a guest invitation token
+      description: Redeem a guest invitation token to obtain a guest session.
+      operationId: RedeemGuestInvitation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/guestInvitationRedeemRequest'
+            examples:
+              redeem token:
+                value:
+                  token: v1.5d41402abc4b2a76b9719d911017c5923c3a5a1e1f4e5d6c
+      responses:
+        '200':
+          description: "Success"
+          headers:
+            Set-Cookie:
+              description: >-
+                Host-only, HttpOnly and Secure guest session cookie (default name
+                `__Host-oc_guest_session`).
+              schema:
+                type: string
+        '400':
+          description: The request body is malformed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/guestInvitationError'
+              examples:
+                invalid request:
+                  value:
+                    error_type: invalid_request
+                    message: The request body is malformed.
+                    share_id: ''
+        '401':
+          description: The token is invalid or has expired.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/guestInvitationError'
+              examples:
+                token invalid:
+                  value:
+                    error_type: token_invalid
+                    message: invalid token
+                    share_id: ''
+                token expired:
+                  value:
+                    error_type: token_expired
+                    message: token expired
+                    share_id: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
+        '404':
+          description: The token or the referenced share could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/guestInvitationError'
+              examples:
+                token not found:
+                  value:
+                    error_type: token_not_found
+                    message: record not found
+                    share_id: ''
+                share not found:
+                  value:
+                    error_type: share_not_found
+                    message: share not found
+                    share_id: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
+        '409':
+          description: The token has already been redeemed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/guestInvitationError'
+              examples:
+                token already redeemed:
+                  value:
+                    error_type: token_already_redeemed
+                    message: token already redeemed
+                    share_id: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
+        '410':
+          description: The referenced share has expired.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/guestInvitationError'
+              examples:
+                share expired:
+                  value:
+                    error_type: share_expired
+                    message: share expired
+                    share_id: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
+        '500':
+          description: An internal error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/guestInvitationError'
+              examples:
+                internal error:
+                  value:
+                    error_type: internal_error
+                    message: An internal error occurred.
+                    share_id: ''
+        default:
+          $ref: '#/components/responses/error'
   '/v1beta1/me/drives':
     # $ref is buggy in the openapi-generator v7.0.1
     # $ref: '#/paths/~1v1.0~1me~1drives'
@@ -4581,6 +4692,41 @@ components:
           type: array
           items:
             type: string
+    guestInvitationRedeemRequest:
+      description: Request body for redeeming a guest invitation token.
+      type: object
+      required:
+        - token
+      properties:
+        token:
+          type: string
+          description: One-time guest invitation token received from the invitation link.
+    guestInvitationError:
+      description: Error returned by the guest invitation redeem endpoint.
+      type: object
+      required:
+        - error_type
+        - message
+        - share_id
+      properties:
+        error_type:
+          type: string
+          description: Machine-readable error identifier.
+          enum:
+            - token_invalid
+            - token_not_found
+            - token_expired
+            - token_already_redeemed
+            - share_not_found
+            - share_expired
+            - invalid_request
+            - internal_error
+        message:
+          type: string
+          description: Human-readable error message.
+        share_id:
+          type: string
+          description: Share identifier related to the error, when known.
     educationSchool:
       description: Represents a school
       type: object
