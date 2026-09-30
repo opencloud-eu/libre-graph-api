@@ -220,6 +220,14 @@ paths:
                 `__Host-oc_guest_session`).
               schema:
                 type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/guestInvitationRedeemResponse'
+              examples:
+                success:
+                  value:
+                    permissionId: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
         '400':
           description: The request body is malformed.
           content:
@@ -229,9 +237,9 @@ paths:
               examples:
                 invalid request:
                   value:
-                    error_type: invalid_request
+                    errorType: invalidRequest
                     message: The request body is malformed.
-                    share_id: ''
+                    permissionId: ''
         '401':
           description: The token is invalid or has expired.
           content:
@@ -241,14 +249,14 @@ paths:
               examples:
                 token invalid:
                   value:
-                    error_type: token_invalid
+                    errorType: tokenInvalid
                     message: invalid token
-                    share_id: ''
+                    permissionId: ''
                 token expired:
                   value:
-                    error_type: token_expired
+                    errorType: tokenExpired
                     message: token expired
-                    share_id: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
+                    permissionId: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
         '404':
           description: The token or the referenced share could not be found.
           content:
@@ -258,14 +266,14 @@ paths:
               examples:
                 token not found:
                   value:
-                    error_type: token_not_found
+                    errorType: tokenNotFound
                     message: record not found
-                    share_id: ''
+                    permissionId: ''
                 share not found:
                   value:
-                    error_type: share_not_found
+                    errorType: shareNotFound
                     message: share not found
-                    share_id: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
+                    permissionId: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
         '409':
           description: The token has already been redeemed.
           content:
@@ -275,9 +283,9 @@ paths:
               examples:
                 token already redeemed:
                   value:
-                    error_type: token_already_redeemed
+                    errorType: tokenAlreadyRedeemed
                     message: token already redeemed
-                    share_id: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
+                    permissionId: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
         '410':
           description: The referenced share has expired.
           content:
@@ -287,9 +295,9 @@ paths:
               examples:
                 share expired:
                   value:
-                    error_type: share_expired
+                    errorType: shareExpired
                     message: share expired
-                    share_id: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
+                    permissionId: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
         '500':
           description: An internal error occurred.
           content:
@@ -299,9 +307,9 @@ paths:
               examples:
                 internal error:
                   value:
-                    error_type: internal_error
+                    errorType: internalError
                     message: An internal error occurred.
-                    share_id: ''
+                    permissionId: ''
         default:
           $ref: '#/components/responses/error'
   '/v1beta1/me/drives':
@@ -4701,32 +4709,41 @@ components:
         token:
           type: string
           description: One-time guest invitation token received from the invitation link.
+    guestInvitationRedeemResponse:
+      description: Response body for a successful guest invitation redemption.
+      type: object
+      required:
+        - permissionId
+      properties:
+        permissionId:
+          type: string
+          description: Identifier of the share (permission) the guest was invited to.
     guestInvitationError:
       description: Error returned by the guest invitation redeem endpoint.
       type: object
       required:
-        - error_type
+        - errorType
         - message
-        - share_id
+        - permissionId
       properties:
-        error_type:
+        errorType:
           type: string
           description: Machine-readable error identifier.
           enum:
-            - token_invalid
-            - token_not_found
-            - token_expired
-            - token_already_redeemed
-            - share_not_found
-            - share_expired
-            - invalid_request
-            - internal_error
+            - tokenInvalid
+            - tokenNotFound
+            - tokenExpired
+            - tokenAlreadyRedeemed
+            - shareNotFound
+            - shareExpired
+            - invalidRequest
+            - internalError
         message:
           type: string
           description: Human-readable error message.
-        share_id:
+        permissionId:
           type: string
-          description: Share identifier related to the error, when known.
+          description: Permission (share) identifier related to the error, when known.
     educationSchool:
       description: Represents a school
       type: object
