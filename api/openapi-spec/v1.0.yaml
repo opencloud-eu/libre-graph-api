@@ -193,6 +193,125 @@ paths:
                             name: "secret stuff"
         default:
           $ref: '#/components/responses/error'
+  '/v1beta1/extensions/org.libregraph/guestLinks/redeem':
+    post:
+      tags:
+        - guestLinks
+      summary: Redeem a guest link token
+      description: Redeem a guest link token to obtain a guest session.
+      operationId: RedeemGuestLink
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/guestLinkRedeemRequest'
+            examples:
+              redeem token:
+                value:
+                  token: v1.5d41402abc4b2a76b9719d911017c5923c3a5a1e1f4e5d6c
+      responses:
+        '200':
+          description: "Success"
+          headers:
+            Set-Cookie:
+              description: >-
+                Host-only, HttpOnly and Secure guest session cookie (default name
+                `__Host-oc_guest_session`).
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/guestLinkRedeemResponse'
+              examples:
+                success:
+                  value:
+                    permissionId: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
+        '400':
+          description: The request body is malformed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/guestLinkError'
+              examples:
+                invalid request:
+                  value:
+                    errorType: invalidRequest
+                    message: The request body is malformed.
+                    permissionId: ''
+        '401':
+          description: The token is invalid or has expired.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/guestLinkError'
+              examples:
+                token invalid:
+                  value:
+                    errorType: tokenInvalid
+                    message: invalid token
+                    permissionId: ''
+                token expired:
+                  value:
+                    errorType: tokenExpired
+                    message: token expired
+                    permissionId: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
+        '404':
+          description: The token or the referenced share could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/guestLinkError'
+              examples:
+                token not found:
+                  value:
+                    errorType: tokenNotFound
+                    message: record not found
+                    permissionId: ''
+                share not found:
+                  value:
+                    errorType: shareNotFound
+                    message: share not found
+                    permissionId: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
+        '409':
+          description: The token has already been redeemed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/guestLinkError'
+              examples:
+                token already redeemed:
+                  value:
+                    errorType: tokenAlreadyRedeemed
+                    message: token already redeemed
+                    permissionId: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
+        '410':
+          description: The referenced share has expired.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/guestLinkError'
+              examples:
+                share expired:
+                  value:
+                    errorType: shareExpired
+                    message: share expired
+                    permissionId: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
+        '500':
+          description: An internal error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/guestLinkError'
+              examples:
+                internal error:
+                  value:
+                    errorType: internalError
+                    message: An internal error occurred.
+                    permissionId: ''
+        default:
+          $ref: '#/components/responses/error'
   '/v1beta1/me/drives':
     # $ref is buggy in the openapi-generator v7.0.1
     # $ref: '#/paths/~1v1.0~1me~1drives'
@@ -4581,6 +4700,50 @@ components:
           type: array
           items:
             type: string
+    guestLinkRedeemRequest:
+      description: Request body for redeeming a guest link token.
+      type: object
+      required:
+        - token
+      properties:
+        token:
+          type: string
+          description: One-time guest link token received from the guest link.
+    guestLinkRedeemResponse:
+      description: Response body for a successful guest link redemption.
+      type: object
+      required:
+        - permissionId
+      properties:
+        permissionId:
+          type: string
+          description: Identifier of the share (permission) the guest was invited to.
+    guestLinkError:
+      description: Error returned by the guest link redeem endpoint.
+      type: object
+      required:
+        - errorType
+        - message
+        - permissionId
+      properties:
+        errorType:
+          type: string
+          description: Machine-readable error identifier.
+          enum:
+            - tokenInvalid
+            - tokenNotFound
+            - tokenExpired
+            - tokenAlreadyRedeemed
+            - shareNotFound
+            - shareExpired
+            - invalidRequest
+            - internalError
+        message:
+          type: string
+          description: Human-readable error message.
+        permissionId:
+          type: string
+          description: Permission (share) identifier related to the error, when known.
     educationSchool:
       description: Represents a school
       type: object
