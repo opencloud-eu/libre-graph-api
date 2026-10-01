@@ -196,16 +196,16 @@ paths:
   '/v1beta1/extensions/org.libregraph/guestLinks/redeem':
     post:
       tags:
-        - guestInvitations
-      summary: Redeem a guest invitation token
-      description: Redeem a guest invitation token to obtain a guest session.
-      operationId: RedeemGuestInvitation
+        - guestLinks
+      summary: Redeem a guest link token
+      description: Redeem a guest link token to obtain a guest session.
+      operationId: RedeemGuestLink
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/guestInvitationRedeemRequest'
+              $ref: '#/components/schemas/guestLinkRedeemRequest'
             examples:
               redeem token:
                 value:
@@ -223,7 +223,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/guestInvitationRedeemResponse'
+                $ref: '#/components/schemas/guestLinkRedeemResponse'
               examples:
                 success:
                   value:
@@ -233,7 +233,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/guestInvitationError'
+                $ref: '#/components/schemas/guestLinkError'
               examples:
                 invalid request:
                   value:
@@ -245,7 +245,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/guestInvitationError'
+                $ref: '#/components/schemas/guestLinkError'
               examples:
                 token invalid:
                   value:
@@ -262,7 +262,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/guestInvitationError'
+                $ref: '#/components/schemas/guestLinkError'
               examples:
                 token not found:
                   value:
@@ -279,7 +279,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/guestInvitationError'
+                $ref: '#/components/schemas/guestLinkError'
               examples:
                 token already redeemed:
                   value:
@@ -291,7 +291,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/guestInvitationError'
+                $ref: '#/components/schemas/guestLinkError'
               examples:
                 share expired:
                   value:
@@ -303,7 +303,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/guestInvitationError'
+                $ref: '#/components/schemas/guestLinkError'
               examples:
                 internal error:
                   value:
@@ -4700,17 +4700,17 @@ components:
           type: array
           items:
             type: string
-    guestInvitationRedeemRequest:
-      description: Request body for redeeming a guest invitation token.
+    guestLinkRedeemRequest:
+      description: Request body for redeeming a guest link token.
       type: object
       required:
         - token
       properties:
         token:
           type: string
-          description: One-time guest invitation token received from the invitation link.
-    guestInvitationRedeemResponse:
-      description: Response body for a successful guest invitation redemption.
+          description: One-time guest link token received from the guest link.
+    guestLinkRedeemResponse:
+      description: Response body for a successful guest link redemption.
       type: object
       required:
         - permissionId
@@ -4718,8 +4718,8 @@ components:
         permissionId:
           type: string
           description: Identifier of the share (permission) the guest was invited to.
-    guestInvitationError:
-      description: Error returned by the guest invitation redeem endpoint.
+    guestLinkError:
+      description: Error returned by the guest link redeem endpoint.
       type: object
       required:
         - errorType
