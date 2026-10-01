@@ -193,7 +193,7 @@ paths:
                             name: "secret stuff"
         default:
           $ref: '#/components/responses/error'
-  '/v1beta1/extensions/org.libregraph/guestInvitations/redeem':
+  '/v1beta1/extensions/org.libregraph/guestLinks/redeem':
     post:
       tags:
         - guestInvitations
