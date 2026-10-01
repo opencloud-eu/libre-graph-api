@@ -4697,6 +4697,24 @@ paths:
         (https://learn.microsoft.com/en-us/graph/api/search-query). Request and
         response follow the MS Graph resource types; Libregraph additions carry
         the `@libre.graph.` prefix.
+      parameters:
+        - name: $expand
+          in: query
+          description: |
+            Relationships to expand inline on each hit's driveItem. Only
+            `thumbnails` is supported, attaching a preview thumbnail set for
+            thumbnailable mime types. Libregraph extension: MS Graph search has no
+            $expand and returns no thumbnails on search hits.
+          required: false
+          style: form
+          explode: false
+          schema:
+            type: array
+            uniqueItems: true
+            items:
+              type: string
+              enum:
+                - thumbnails
       requestBody:
         required: true
         content:
