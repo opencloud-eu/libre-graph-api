@@ -4674,6 +4674,66 @@ paths:
                     '@libre.graph.weight': 4
         default:
           $ref: '#/components/responses/error'
+  /v1beta1/search/query:
+    post:
+      tags:
+        - search
+      summary: Search for resources
+      operationId: SearchQuery
+      description: |
+        Run a specified search query. Search results are provided in the response.
+
+        The search endpoint allows clients to search for resources across all
+        accessible spaces and retrieve aggregated metadata (facets) about the
+        result set.
+
+        The query string uses KQL (Keyword Query Language) syntax for filtering.
+
+        Modeled on the MS Graph search query endpoint
+        (https://learn.microsoft.com/en-us/graph/api/search-query). Request and
+        response follow the MS Graph resource types; Libregraph additions carry
+        the `@libre.graph.` prefix.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - requests
+              properties:
+                requests:
+                  type: array
+                  description: A collection of one or more search requests.
+                  minItems: 1
+                  items:
+                    $ref: '#/components/schemas/searchRequest'
+            examples:
+              simple search:
+                summary: Simple keyword search
+                value:
+                  requests:
+                    - entityTypes:
+                        - driveItem
+                      query:
+                        queryString: budget report
+                      from: 0
+                      size: 25
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  value:
+                    type: array
+                    description: A collection of search response objects, one per request.
+                    items:
+                      $ref: '#/components/schemas/searchResponse'
+        default:
+          $ref: '#/components/responses/error'
 components:
   schemas:
     tagAssignment:
@@ -6511,6 +6571,133 @@ components:
         #  type: array
         #  items:
         #    type: string
+    searchRequest:
+      type: object
+      description: |
+        Represents an individual search request within a search query. Follows
+        the [MS Graph searchRequest](https://learn.microsoft.com/en-us/graph/api/resources/searchrequest)
+        resource type.
+      required:
+        - entityTypes
+        - query
+      properties:
+        entityTypes:
+          type: array
+          description: |
+            One or more types of resources expected in the response. Currently
+            only `driveItem` is supported.
+          minItems: 1
+          items:
+            type: string
+            enum:
+              - driveItem
+        query:
+          $ref: '#/components/schemas/searchQuery'
+        from:
+          type: integer
+          format: int32
+          description: |
+            Specifies the offset for the search results. Offset 0 returns the
+            very first result. Used together with the `size` property for
+            pagination.
+          default: 0
+          minimum: 0
+        size:
+          type: integer
+          format: int32
+          description: |
+            The size of the page to be retrieved. The maximum value is 500.
+          default: 25
+          minimum: 0
+          maximum: 500
+    searchQuery:
+      type: object
+      description: |
+        Represents the search query. Follows the
+        [MS Graph searchQuery](https://learn.microsoft.com/en-us/graph/api/resources/searchquery)
+        resource type.
+      required:
+        - queryString
+      properties:
+        queryString:
+          type: string
+          description: |
+            The search query string in KQL (Keyword Query Language) format. The
+            query string can contain free-text keywords and property filters.
+
+            Examples:
+            - `budget report`: free text search
+            - `mediatype:audio`: filter by media type
+            - `audio.artist:"Saxon"`: filter by audio metadata
+            - `audio.genre:Rock AND audio.year:1979`: combined filters
+    searchResponse:
+      type: object
+      description: |
+        Represents the response for an individual search request. Follows the
+        [MS Graph searchResponse](https://learn.microsoft.com/en-us/graph/api/resources/searchresponse)
+        resource type.
+      properties:
+        searchTerms:
+          type: array
+          description: Contains the search terms sent in the initial search query.
+          items:
+            type: string
+        hitsContainers:
+          type: array
+          description: |
+            A collection of search result sets. One for each entity type that
+            was queried.
+          items:
+            $ref: '#/components/schemas/searchHitsContainer'
+    searchHitsContainer:
+      type: object
+      description: |
+        Contains a collection of search results. Follows the
+        [MS Graph searchHitsContainer](https://learn.microsoft.com/en-us/graph/api/resources/searchhitscontainer)
+        resource type.
+      properties:
+        hits:
+          type: array
+          description: A collection of the search results.
+          items:
+            $ref: '#/components/schemas/searchHit'
+        total:
+          type: integer
+          format: int64
+          description: |
+            The total number of results. Note this is not the number of results
+            on the page, but the total number of results satisfying the query.
+          readOnly: true
+        moreResultsAvailable:
+          type: boolean
+          description: |
+            Provides information if more results are available. Based on this
+            information, you can adjust the `from` and `size` properties of the
+            `searchRequest` accordingly.
+          readOnly: true
+    searchHit:
+      type: object
+      description: |
+        Represents an individual search result. Follows the
+        [MS Graph searchHit](https://learn.microsoft.com/en-us/graph/api/resources/searchhit)
+        resource type.
+      properties:
+        hitId:
+          type: string
+          description: The internal identifier for the item.
+          readOnly: true
+        rank:
+          type: integer
+          format: int32
+          description: The rank or the order of the result.
+          readOnly: true
+        summary:
+          type: string
+          description: |
+            A summary of the result, if a summary is available.
+          readOnly: true
+        resource:
+          $ref: '#/components/schemas/driveItem'
     odata.error:
       required:
         - error
