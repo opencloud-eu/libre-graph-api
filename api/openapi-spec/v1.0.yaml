@@ -6797,6 +6797,18 @@ components:
           minimum: 1
         bucketDefinition:
           $ref: '#/components/schemas/bucketDefinition'
+        '@libre.graph.subAggregations':
+          type: array
+          description: |
+            Nested aggregations computed within each bucket of this
+            aggregation. Libregraph extension not present in MS Graph.
+
+            Backends that don't support native composite aggregations
+            (e.g. bleve) emulate them by walking the matched result
+            set; OpenSearch translates them to native composite
+            aggregations.
+          items:
+            $ref: '#/components/schemas/aggregationOption'
         '@libre.graph.metricDefinition':
           $ref: '#/components/schemas/metricDefinition'
     metricDefinition:
@@ -7055,6 +7067,14 @@ components:
             followed by `to="le"`, e.g. `range(min, 1980)`,
             `range(1980, 1990)` and `range(2010, max, to="le")`. This is the
             same encoding MS Graph uses.
+        '@libre.graph.subAggregations':
+          type: array
+          description: |
+            Nested aggregation results, one per sub-aggregation requested
+            on the parent `aggregationOption`. Libregraph extension not
+            present in MS Graph.
+          items:
+            $ref: '#/components/schemas/searchAggregation'
     odata.error:
       required:
         - error
