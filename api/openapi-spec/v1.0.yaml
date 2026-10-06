@@ -223,7 +223,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/guestLinkRedeemResponse'
+                $ref: '#/components/schemas/guestLinkSessionResponse'
               examples:
                 success:
                   value:
@@ -285,6 +285,317 @@ paths:
                   value:
                     errorType: tokenAlreadyRedeemed
                     message: token already redeemed
+                    permissionId: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
+        '410':
+          description: The referenced share has expired.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/guestLinkError'
+              examples:
+                share expired:
+                  value:
+                    errorType: shareExpired
+                    message: share expired
+                    permissionId: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
+        '500':
+          description: An internal error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/guestLinkError'
+              examples:
+                internal error:
+                  value:
+                    errorType: internalError
+                    message: An internal error occurred.
+                    permissionId: ''
+        default:
+          $ref: '#/components/responses/error'
+  '/v1beta1/extensions/org.libregraph/guestLinks/verify/token':
+    post:
+      tags:
+        - guestLinks
+      summary: "Alias for '/v1beta1/extensions/org.libregraph/guestLinks/redeem'"
+      description: Redeem a guest link token to obtain a guest session. Alias of the redeem endpoint.
+      operationId: VerifyGuestLinkToken
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/guestLinkRedeemRequest'
+            examples:
+              redeem token:
+                value:
+                  token: v1.5d41402abc4b2a76b9719d911017c5923c3a5a1e1f4e5d6c
+      responses:
+        '200':
+          description: "Success"
+          headers:
+            Set-Cookie:
+              description: >-
+                Host-only, HttpOnly and Secure guest session cookie (default name
+                `__Host-oc_guest_session`).
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/guestLinkSessionResponse'
+              examples:
+                success:
+                  value:
+                    permissionId: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
+        '400':
+          description: The request body is malformed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/guestLinkError'
+              examples:
+                invalid request:
+                  value:
+                    errorType: invalidRequest
+                    message: The request body is malformed.
+                    permissionId: ''
+        '401':
+          description: The token is invalid or has expired.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/guestLinkError'
+              examples:
+                token invalid:
+                  value:
+                    errorType: tokenInvalid
+                    message: invalid token
+                    permissionId: ''
+                token expired:
+                  value:
+                    errorType: tokenExpired
+                    message: token expired
+                    permissionId: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
+        '404':
+          description: The token or the referenced share could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/guestLinkError'
+              examples:
+                token not found:
+                  value:
+                    errorType: tokenNotFound
+                    message: record not found
+                    permissionId: ''
+                share not found:
+                  value:
+                    errorType: shareNotFound
+                    message: share not found
+                    permissionId: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
+        '409':
+          description: The token has already been redeemed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/guestLinkError'
+              examples:
+                token already redeemed:
+                  value:
+                    errorType: tokenAlreadyRedeemed
+                    message: token already redeemed
+                    permissionId: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
+        '410':
+          description: The referenced share has expired.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/guestLinkError'
+              examples:
+                share expired:
+                  value:
+                    errorType: shareExpired
+                    message: share expired
+                    permissionId: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
+        '500':
+          description: An internal error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/guestLinkError'
+              examples:
+                internal error:
+                  value:
+                    errorType: internalError
+                    message: An internal error occurred.
+                    permissionId: ''
+        default:
+          $ref: '#/components/responses/error'
+  '/v1beta1/extensions/org.libregraph/guestLinks/renew':
+    post:
+      tags:
+        - guestLinks
+      summary: Renew a guest link
+      description: >-
+        Generate a new guest link token and PIN for an existing guest link and
+        publish the renewal event so the guest can be notified.
+      operationId: RenewGuestLink
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/guestLinkRenewRequest'
+            examples:
+              renew guest link:
+                value:
+                  permissionId: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
+      responses:
+        '200':
+          description: Success. The response has an empty body.
+        '400':
+          description: The request body is malformed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/guestLinkError'
+              examples:
+                invalid request:
+                  value:
+                    errorType: invalidRequest
+                    message: The request body is malformed.
+                    permissionId: ''
+        '404':
+          description: The guest link record or the referenced share could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/guestLinkError'
+              examples:
+                token not found:
+                  value:
+                    errorType: tokenNotFound
+                    message: record not found
+                    permissionId: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
+                share not found:
+                  value:
+                    errorType: shareNotFound
+                    message: share not found
+                    permissionId: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
+        '410':
+          description: The referenced share has expired.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/guestLinkError'
+              examples:
+                share expired:
+                  value:
+                    errorType: shareExpired
+                    message: share expired
+                    permissionId: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
+        '500':
+          description: An internal error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/guestLinkError'
+              examples:
+                internal error:
+                  value:
+                    errorType: internalError
+                    message: An internal error occurred.
+                    permissionId: ''
+        '503':
+          description: The service is unable to publish the renewal event.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/guestLinkError'
+              examples:
+                service unavailable:
+                  value:
+                    errorType: serviceUnavailable
+                    message: event publisher not configured
+                    permissionId: ''
+        default:
+          $ref: '#/components/responses/error'
+  '/v1beta1/extensions/org.libregraph/guestLinks/verify/pin':
+    post:
+      tags:
+        - guestLinks
+      summary: Verify a guest link PIN
+      description: Exchange a PIN and a share id for a guest session.
+      operationId: VerifyGuestLinkPin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/guestLinkVerifyPinRequest'
+            examples:
+              verify pin:
+                value:
+                  pin: "123456"
+                  permissionId: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
+      responses:
+        '200':
+          description: "Success"
+          headers:
+            Set-Cookie:
+              description: >-
+                Host-only, HttpOnly and Secure guest session cookie (default name
+                `__Host-oc_guest_session`).
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/guestLinkSessionResponse'
+              examples:
+                success:
+                  value:
+                    permissionId: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
+        '400':
+          description: The request body is malformed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/guestLinkError'
+              examples:
+                invalid request:
+                  value:
+                    errorType: invalidRequest
+                    message: The request body is malformed.
+                    permissionId: ''
+        '401':
+          description: The PIN is invalid or has expired.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/guestLinkError'
+              examples:
+                pin invalid:
+                  value:
+                    errorType: pinInvalid
+                    message: pin invalid
+                    permissionId: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
+                pin expired:
+                  value:
+                    errorType: pinExpired
+                    message: pin expired
+                    permissionId: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
+        '404':
+          description: The referenced share could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/guestLinkError'
+              examples:
+                share not found:
+                  value:
+                    errorType: shareNotFound
+                    message: share not found
                     permissionId: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
         '410':
           description: The referenced share has expired.
@@ -4907,8 +5218,11 @@ components:
         token:
           type: string
           description: One-time guest link token received from the guest link.
-    guestLinkRedeemResponse:
-      description: Response body for a successful guest link redemption.
+    guestLinkSessionResponse:
+      description: >-
+        Response body for a successful guest link authentication: the share
+        (permission) id the guest was invited to. A session cookie is set via
+        the Set-Cookie header.
       type: object
       required:
         - permissionId
@@ -4916,8 +5230,30 @@ components:
         permissionId:
           type: string
           description: Identifier of the share (permission) the guest was invited to.
+    guestLinkRenewRequest:
+      description: Request body for renewing a guest link.
+      type: object
+      required:
+        - permissionId
+      properties:
+        permissionId:
+          type: string
+          description: Identifier of the share (permission) the guest was invited to.
+    guestLinkVerifyPinRequest:
+      description: Request body for verifying a guest link PIN.
+      type: object
+      required:
+        - pin
+        - permissionId
+      properties:
+        pin:
+          type: string
+          description: One-time PIN received from the renewed guest link.
+        permissionId:
+          type: string
+          description: Identifier of the share (permission) the guest was invited to.
     guestLinkError:
-      description: Error returned by the guest link redeem endpoint.
+      description: Error returned by a guest link endpoint.
       type: object
       required:
         - errorType
@@ -4934,6 +5270,9 @@ components:
             - tokenAlreadyRedeemed
             - shareNotFound
             - shareExpired
+            - pinInvalid
+            - pinExpired
+            - serviceUnavailable
             - invalidRequest
             - internalError
         message:
