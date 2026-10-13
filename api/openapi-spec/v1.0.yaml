@@ -215,11 +215,10 @@ paths:
           description: "Success"
           headers:
             Set-Cookie:
-              description: >-
-                Host-only, HttpOnly and Secure guest session cookie (default name
-                `__Host-oc_guest_session`).
+              description: Sets the guest session cookie `__Host-oc_guest_session`.
               schema:
                 type: string
+              example: "__Host-oc_guest_session=<value>"
           content:
             application/json:
               schema:
@@ -334,7 +333,16 @@ paths:
                   token: v1.5d41402abc4b2a76b9719d911017c5923c3a5a1e1f4e5d6c
       responses:
         '200':
-          description: Success. The response has an empty body.
+          description: >-
+            Success. The response has an empty body. The renewed nonce is
+            returned in the Set-Cookie header and must be sent back to the
+            verify pin endpoint.
+          headers:
+            Set-Cookie:
+              description: Sets the `__Host-oc_guest_nonce` cookie.
+              schema:
+                type: string
+              example: "__Host-oc_guest_nonce=<value>"
         '400':
           description: The request body is malformed.
           content:
@@ -393,6 +401,24 @@ paths:
                     errorType: shareExpired
                     message: share expired
                     permissionId: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
+        '429':
+          description: The renewal rate limit for this share has been reached.
+          headers:
+            Retry-After:
+              description: Number of seconds to wait before retrying.
+              schema:
+                type: integer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/guestLinkError'
+              examples:
+                too many requests:
+                  value:
+                    errorType: tooManyRequests
+                    message: too many attempts
+                    permissionId: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
+                    retryAfter: 60
         '500':
           description: An internal error occurred.
           content:
@@ -426,6 +452,15 @@ paths:
       summary: Verify a guest link PIN
       description: Exchange a PIN and a share id for a guest session.
       operationId: VerifyGuestLinkPin
+      parameters:
+        - name: __Host-oc_guest_nonce
+          in: cookie
+          required: true
+          description: >-
+            Nonce cookie set by the renew endpoint, binding the PIN to the
+            browser that renewed the link.
+          schema:
+            type: string
       requestBody:
         required: true
         content:
@@ -439,14 +474,19 @@ paths:
                   permissionId: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
       responses:
         '200':
-          description: "Success"
+          description: >-
+            Success. A guest session cookie is set and the nonce cookie is
+            cleared via the Set-Cookie header.
           headers:
             Set-Cookie:
               description: >-
-                Host-only, HttpOnly and Secure guest session cookie (default name
-                `__Host-oc_guest_session`).
+                Sets the guest session cookie `__Host-oc_guest_session` and
+                clears `__Host-oc_guest_nonce`.
               schema:
                 type: string
+              example:
+                - "__Host-oc_guest_session=<value>"
+                - "__Host-oc_guest_nonce="
           content:
             application/json:
               schema:
@@ -456,7 +496,7 @@ paths:
                   value:
                     permissionId: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
         '400':
-          description: The request body is malformed.
+          description: The request body is malformed or the nonce cookie is missing.
           content:
             application/json:
               schema:
@@ -467,13 +507,28 @@ paths:
                     errorType: invalidRequest
                     message: The request body is malformed.
                     permissionId: ''
+                nonce cookie missing:
+                  value:
+                    errorType: invalidRequest
+                    message: The nonce cookie is missing from the request.
+                    permissionId: ''
         '401':
-          description: The PIN is invalid or has expired.
+          description: The nonce or the PIN is invalid or has expired.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/guestLinkError'
               examples:
+                nonce invalid:
+                  value:
+                    errorType: nonceInvalid
+                    message: nonce invalid
+                    permissionId: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
+                nonce expired:
+                  value:
+                    errorType: nonceExpired
+                    message: nonce expired
+                    permissionId: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
                 pin invalid:
                   value:
                     errorType: pinInvalid
@@ -508,6 +563,24 @@ paths:
                     errorType: shareExpired
                     message: share expired
                     permissionId: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
+        '429':
+          description: Too many failed PIN attempts; the endpoint is rate limited.
+          headers:
+            Retry-After:
+              description: Number of seconds to wait before retrying.
+              schema:
+                type: integer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/guestLinkError'
+              examples:
+                too many requests:
+                  value:
+                    errorType: tooManyRequests
+                    message: too many attempts
+                    permissionId: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
+                    retryAfter: 60
         '500':
           description: An internal error occurred.
           content:
@@ -5180,6 +5253,9 @@ components:
             - shareExpired
             - pinInvalid
             - pinExpired
+            - nonceInvalid
+            - nonceExpired
+            - tooManyRequests
             - serviceUnavailable
             - invalidRequest
             - internalError
@@ -5189,6 +5265,12 @@ components:
         permissionId:
           type: string
           description: Permission (share) identifier related to the error, when known.
+        retryAfter:
+          type: integer
+          description: >-
+            Number of seconds the client should wait before retrying. Present
+            on rate-limited (429) responses and mirrored in the Retry-After
+            response header.
     educationSchool:
       description: Represents a school
       type: object
