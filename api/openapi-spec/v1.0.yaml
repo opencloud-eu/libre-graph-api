@@ -339,12 +339,14 @@ paths:
             verify pin endpoint.
           headers:
             Set-Cookie:
-              description: Sets the `__Host-oc_guest_nonce` cookie.
+              description: >-
+                Sets the per-share nonce cookie
+                `__Host-oc_guest_nonce_<share-hash>`.
               schema:
                 type: string
-              example: "__Host-oc_guest_nonce=<value>"
+              example: "__Host-oc_guest_nonce_<share-hash>=<value>"
         '400':
-          description: The request body is malformed.
+          description: The request body is malformed or a required field is missing.
           content:
             application/json:
               schema:
@@ -355,8 +357,13 @@ paths:
                     errorType: invalidRequest
                     message: The request body is malformed.
                     permissionId: ''
+                token missing:
+                  value:
+                    errorType: invalidRequest
+                    message: The request body is missing the token.
+                    permissionId: ''
         '401':
-          description: The credentials are missing or do not belong to the guest link.
+          description: The previous link token is missing or invalid.
           content:
             application/json:
               schema:
@@ -367,11 +374,6 @@ paths:
                     errorType: tokenInvalid
                     message: invalid token
                     permissionId: ''
-                session invalid:
-                  value:
-                    errorType: sessionInvalid
-                    message: invalid session
-                    permissionId: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
         '404':
           description: The guest link record or the referenced share could not be found.
           content:
@@ -388,6 +390,20 @@ paths:
                   value:
                     errorType: shareNotFound
                     message: share not found
+                    permissionId: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
+        '409':
+          description: >-
+            The guest link record was updated concurrently; the client should
+            retry the renewal.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/guestLinkError'
+              examples:
+                concurrent update:
+                  value:
+                    errorType: conflict
+                    message: record was modified concurrently
                     permissionId: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
         '410':
           description: The referenced share has expired.
@@ -457,7 +473,8 @@ paths:
           in: cookie
           required: true
           description: >-
-            Nonce cookie set by the renew endpoint, binding the PIN to the
+            Per-share nonce cookie set by the renew endpoint
+            (`__Host-oc_guest_nonce_<share-hash>`), binding the PIN to the
             browser that renewed the link.
           schema:
             type: string
@@ -481,12 +498,13 @@ paths:
             Set-Cookie:
               description: >-
                 Sets the guest session cookie `__Host-oc_guest_session` and
-                clears `__Host-oc_guest_nonce`.
+                clears the per-share nonce cookie
+                `__Host-oc_guest_nonce_<share-hash>`.
               schema:
                 type: string
               example:
                 - "__Host-oc_guest_session=<value>"
-                - "__Host-oc_guest_nonce="
+                - "__Host-oc_guest_nonce_<share-hash>="
           content:
             application/json:
               schema:
@@ -540,12 +558,17 @@ paths:
                     message: pin expired
                     permissionId: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
         '404':
-          description: The referenced share could not be found.
+          description: The guest link record or the referenced share could not be found.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/guestLinkError'
               examples:
+                token not found:
+                  value:
+                    errorType: tokenNotFound
+                    message: record not found
+                    permissionId: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
                 share not found:
                   value:
                     errorType: shareNotFound
@@ -5204,12 +5227,12 @@ components:
           description: Identifier of the share (permission) the guest was invited to.
     guestLinkRenewRequest:
       description: >-
-        Request body for renewing a guest link. Besides the share (permission)
-        id, the previous guest link token or a (possibly expired) guest session
-        cookie is required to authorize the renewal.
+        Request body for renewing a guest link. The share (permission) id and
+        the previous guest link token are required to authorize the renewal.
       type: object
       required:
         - permissionId
+        - token
       properties:
         permissionId:
           type: string
@@ -5217,8 +5240,8 @@ components:
         token:
           type: string
           description: >-
-            Previous guest link token. Optional when the guest session cookie is
-            sent instead.
+            Previous guest link token (the latest issued one), used to authorize
+            the renewal.
     guestLinkVerifyPinRequest:
       description: Request body for verifying a guest link PIN.
       type: object
@@ -5248,13 +5271,13 @@ components:
             - tokenNotFound
             - tokenExpired
             - tokenAlreadyRedeemed
-            - sessionInvalid
             - shareNotFound
             - shareExpired
             - pinInvalid
             - pinExpired
             - nonceInvalid
             - nonceExpired
+            - conflict
             - tooManyRequests
             - serviceUnavailable
             - invalidRequest
