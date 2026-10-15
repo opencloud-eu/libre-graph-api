@@ -318,11 +318,11 @@ paths:
       summary: Renew a guest link
       description: >-
         Renew a guest link. When the request carries a valid guest session
-        cookie (possibly expired), the link token is rotated silently: no new
-        PIN is generated and no nonce cookie is set. Without a valid session a
-        new link token and PIN are generated, the renewal event is published so
-        the guest can be notified, and the nonce cookie that binds the PIN to
-        the browser is set; this path is rate limited.
+        cookie (possibly expired), a new link token and PIN are generated, the
+        renewal event is published so the guest can be notified, and the nonce
+        cookie that binds the PIN to the browser is set; this path is rate
+        limited. Without a valid session the link token is rotated silently: no
+        new PIN is generated and no nonce cookie is set.
       operationId: RenewGuestLink
       requestBody:
         required: true
@@ -337,15 +337,15 @@ paths:
       responses:
         '200':
           description: >-
-            Success. The response has an empty body. On the PIN path the
-            renewed nonce is returned in the Set-Cookie header and must be sent
-            back to the verify pin endpoint; a silent renewal (valid session)
-            sets no cookie.
+            Success. The response has an empty body. When a valid session
+            authorized the renewal the renewed nonce is returned in the
+            Set-Cookie header and must be sent back to the verify pin endpoint;
+            a silent renewal (no session) sets no cookie.
           headers:
             Set-Cookie:
               description: >-
-                On the PIN path, sets the per-share nonce cookie
-                `__Host-oc_guest_nonce_<share-hash>`.
+                When a valid session authorized the renewal, sets the per-share
+                nonce cookie `__Host-oc_guest_nonce_<share-hash>`.
               schema:
                 type: string
               example: "__Host-oc_guest_nonce_<share-hash>=<value>"
