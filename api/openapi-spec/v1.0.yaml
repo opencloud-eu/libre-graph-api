@@ -320,9 +320,9 @@ paths:
         Renew a guest link. When the request carries a valid guest session
         cookie (possibly expired), a new link token and PIN are generated, the
         renewal event is published so the guest can be notified, and the nonce
-        cookie that binds the PIN to the browser is set; this path is rate
-        limited. Without a valid session the link token is rotated silently: no
-        new PIN is generated and no nonce cookie is set.
+        cookie that binds the PIN to the browser is set. Without a valid session
+        the link token is rotated silently: no new PIN is generated, no nonce
+        cookie is set, and the request is rate limited.
       operationId: RenewGuestLink
       requestBody:
         required: true
@@ -405,7 +405,10 @@ paths:
                     message: share expired
                     permissionId: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
         '429':
-          description: The renewal rate limit for this share has been reached.
+          description: >-
+            The renewal rate limit for this share has been reached. It applies
+            to renewals without a valid session; a session-authorized renewal is
+            not rate limited.
           headers:
             Retry-After:
               description: Number of seconds to wait before retrying.
