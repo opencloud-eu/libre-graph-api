@@ -228,6 +228,7 @@ paths:
                 success:
                   value:
                     permissionId: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
+                    expirationDateTime: '2026-10-15T08:30:00Z'
         '400':
           description: The request body is malformed.
           content:
@@ -455,6 +456,7 @@ paths:
                 success:
                   value:
                     permissionId: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
+                    expirationDateTime: '2026-10-15T08:30:00Z'
         '400':
           description: The request body is malformed.
           content:
@@ -5120,15 +5122,22 @@ components:
     guestLinkSessionResponse:
       description: >-
         Response body for a successful guest link authentication: the share
-        (permission) id the guest was invited to. A session cookie is set via
-        the Set-Cookie header.
+        (permission) id the guest was invited to and the expiry of the guest
+        session. A session cookie is set via the Set-Cookie header.
       type: object
       required:
         - permissionId
+        - expirationDateTime
       properties:
         permissionId:
           type: string
           description: Identifier of the share (permission) the guest was invited to.
+        expirationDateTime:
+          type: string
+          format: date-time
+          description: >-
+            The date and time when the guest session expires, in UTC. After that
+            the guest has to renew the guest link.
     guestLinkRenewRequest:
       description: >-
         Request body for renewing a guest link. Besides the share (permission)
