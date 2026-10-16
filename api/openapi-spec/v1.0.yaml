@@ -215,11 +215,10 @@ paths:
           description: "Success"
           headers:
             Set-Cookie:
-              description: >-
-                Host-only, HttpOnly and Secure guest session cookie (default name
-                `__Host-oc_guest_session`).
+              description: Sets the guest session cookie `__Host-oc_guest_session`.
               schema:
                 type: string
+              example: "__Host-oc_guest_session=<value>"
           content:
             application/json:
               schema:
@@ -319,8 +318,12 @@ paths:
         - guestLinks
       summary: Renew a guest link
       description: >-
-        Generate a new guest link token and PIN for an existing guest link and
-        publish the renewal event so the guest can be notified.
+        Renew a guest link. When the request carries a valid guest session
+        cookie (possibly expired), a new link token and PIN are generated, the
+        renewal event is published so the guest can be notified, and the nonce
+        cookie that binds the PIN to the browser is set. Without a valid session
+        the link token is rotated silently: no new PIN is generated, no nonce
+        cookie is set, and the request is rate limited.
       operationId: RenewGuestLink
       requestBody:
         required: true
@@ -332,12 +335,23 @@ paths:
               renew guest link:
                 value:
                   permissionId: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
-                  token: v1.5d41402abc4b2a76b9719d911017c5923c3a5a1e1f4e5d6c
       responses:
         '200':
-          description: Success. The response has an empty body.
+          description: >-
+            Success. The response has an empty body. When a valid session
+            authorized the renewal the renewed nonce is returned in the
+            Set-Cookie header and must be sent back to the verify pin endpoint;
+            a silent renewal (no session) sets no cookie.
+          headers:
+            Set-Cookie:
+              description: >-
+                When a valid session authorized the renewal, sets the per-share
+                nonce cookie `__Host-oc_guest_nonce_<share-hash>`.
+              schema:
+                type: string
+              example: "__Host-oc_guest_nonce_<share-hash>=<value>"
         '400':
-          description: The request body is malformed.
+          description: The request body is malformed or a required field is missing.
           content:
             application/json:
               schema:
@@ -348,23 +362,6 @@ paths:
                     errorType: invalidRequest
                     message: The request body is malformed.
                     permissionId: ''
-        '401':
-          description: The credentials are missing or do not belong to the guest link.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/guestLinkError'
-              examples:
-                token invalid:
-                  value:
-                    errorType: tokenInvalid
-                    message: invalid token
-                    permissionId: ''
-                session invalid:
-                  value:
-                    errorType: sessionInvalid
-                    message: invalid session
-                    permissionId: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
         '404':
           description: The guest link record or the referenced share could not be found.
           content:
@@ -382,6 +379,20 @@ paths:
                     errorType: shareNotFound
                     message: share not found
                     permissionId: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
+        '409':
+          description: >-
+            The guest link record was updated concurrently; the client should
+            retry the renewal.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/guestLinkError'
+              examples:
+                concurrent update:
+                  value:
+                    errorType: conflict
+                    message: record was modified concurrently
+                    permissionId: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
         '410':
           description: The referenced share has expired.
           content:
@@ -394,6 +405,27 @@ paths:
                     errorType: shareExpired
                     message: share expired
                     permissionId: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
+        '429':
+          description: >-
+            The renewal rate limit for this share has been reached. It applies
+            to renewals without a valid session; a session-authorized renewal is
+            not rate limited.
+          headers:
+            Retry-After:
+              description: Number of seconds to wait before retrying.
+              schema:
+                type: integer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/guestLinkError'
+              examples:
+                too many requests:
+                  value:
+                    errorType: tooManyRequests
+                    message: too many attempts
+                    permissionId: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
+                    retryAfter: 60
         '500':
           description: An internal error occurred.
           content:
@@ -427,6 +459,16 @@ paths:
       summary: Verify a guest link PIN
       description: Exchange a PIN and a share id for a guest session.
       operationId: VerifyGuestLinkPin
+      parameters:
+        - name: __Host-oc_guest_nonce
+          in: cookie
+          required: true
+          description: >-
+            Per-share nonce cookie set by the renew endpoint
+            (`__Host-oc_guest_nonce_<share-hash>`), binding the PIN to the
+            browser that renewed the link.
+          schema:
+            type: string
       requestBody:
         required: true
         content:
@@ -440,14 +482,20 @@ paths:
                   permissionId: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
       responses:
         '200':
-          description: "Success"
+          description: >-
+            Success. A guest session cookie is set and the nonce cookie is
+            cleared via the Set-Cookie header.
           headers:
             Set-Cookie:
               description: >-
-                Host-only, HttpOnly and Secure guest session cookie (default name
-                `__Host-oc_guest_session`).
+                Sets the guest session cookie `__Host-oc_guest_session` and
+                clears the per-share nonce cookie
+                `__Host-oc_guest_nonce_<share-hash>`.
               schema:
                 type: string
+              example:
+                - "__Host-oc_guest_session=<value>"
+                - "__Host-oc_guest_nonce_<share-hash>="
           content:
             application/json:
               schema:
@@ -458,7 +506,7 @@ paths:
                     permissionId: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
                     expirationDateTime: '2026-10-15T08:30:00Z'
         '400':
-          description: The request body is malformed.
+          description: The request body is malformed or the nonce cookie is missing.
           content:
             application/json:
               schema:
@@ -469,13 +517,28 @@ paths:
                     errorType: invalidRequest
                     message: The request body is malformed.
                     permissionId: ''
+                nonce cookie missing:
+                  value:
+                    errorType: invalidRequest
+                    message: The nonce cookie is missing from the request.
+                    permissionId: ''
         '401':
-          description: The PIN is invalid or has expired.
+          description: The nonce or the PIN is invalid or has expired.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/guestLinkError'
               examples:
+                nonce invalid:
+                  value:
+                    errorType: nonceInvalid
+                    message: nonce invalid
+                    permissionId: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
+                nonce expired:
+                  value:
+                    errorType: nonceExpired
+                    message: nonce expired
+                    permissionId: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
                 pin invalid:
                   value:
                     errorType: pinInvalid
@@ -487,12 +550,17 @@ paths:
                     message: pin expired
                     permissionId: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
         '404':
-          description: The referenced share could not be found.
+          description: The guest link record or the referenced share could not be found.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/guestLinkError'
               examples:
+                token not found:
+                  value:
+                    errorType: tokenNotFound
+                    message: record not found
+                    permissionId: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
                 share not found:
                   value:
                     errorType: shareNotFound
@@ -510,6 +578,24 @@ paths:
                     errorType: shareExpired
                     message: share expired
                     permissionId: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
+        '429':
+          description: Too many failed PIN attempts; the endpoint is rate limited.
+          headers:
+            Retry-After:
+              description: Number of seconds to wait before retrying.
+              schema:
+                type: integer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/guestLinkError'
+              examples:
+                too many requests:
+                  value:
+                    errorType: tooManyRequests
+                    message: too many attempts
+                    permissionId: d14f9f65-2e9b-4fd6-bf6b-6748f229f2a2
+                    retryAfter: 60
         '500':
           description: An internal error occurred.
           content:
@@ -5140,9 +5226,9 @@ components:
             the guest has to renew the guest link.
     guestLinkRenewRequest:
       description: >-
-        Request body for renewing a guest link. Besides the share (permission)
-        id, the previous guest link token or a (possibly expired) guest session
-        cookie is required to authorize the renewal.
+        Request body for renewing a guest link. Only the share (permission) id
+        is sent; the request is authorized by the guest session cookie when one
+        is present.
       type: object
       required:
         - permissionId
@@ -5150,11 +5236,6 @@ components:
         permissionId:
           type: string
           description: Identifier of the share (permission) the guest was invited to.
-        token:
-          type: string
-          description: >-
-            Previous guest link token. Optional when the guest session cookie is
-            sent instead.
     guestLinkVerifyPinRequest:
       description: Request body for verifying a guest link PIN.
       type: object
@@ -5184,11 +5265,14 @@ components:
             - tokenNotFound
             - tokenExpired
             - tokenAlreadyRedeemed
-            - sessionInvalid
             - shareNotFound
             - shareExpired
             - pinInvalid
             - pinExpired
+            - nonceInvalid
+            - nonceExpired
+            - conflict
+            - tooManyRequests
             - serviceUnavailable
             - invalidRequest
             - internalError
@@ -5198,6 +5282,12 @@ components:
         permissionId:
           type: string
           description: Permission (share) identifier related to the error, when known.
+        retryAfter:
+          type: integer
+          description: >-
+            Number of seconds the client should wait before retrying. Present
+            on rate-limited (429) responses and mirrored in the Retry-After
+            response header.
     educationSchool:
       description: Represents a school
       type: object
