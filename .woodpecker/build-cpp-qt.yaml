@@ -33,7 +33,6 @@ steps:
         --git-user-id=opencloud-eu
         --git-repo-id=libre-graph-api-cpp-qt-client
         -g cpp-qt-client
-        -t templates/cpp-qt-client
         -o libre-graph-api-cpp-qt-client'
       - cp LICENSE libre-graph-api-cpp-qt-client/LICENSE
   diff:
