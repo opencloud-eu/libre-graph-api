@@ -338,10 +338,12 @@ paths:
       responses:
         '200':
           description: >-
-            Success. The response has an empty body. When a valid session
-            authorized the renewal the renewed nonce is returned in the
-            Set-Cookie header and must be sent back to the verify pin endpoint;
-            a silent renewal (no session) sets no cookie.
+            Success. The response body reports whether the renewal email
+            contains a PIN (`withPin` is true only when a valid session
+            authorized the renewal). When a valid session authorized the
+            renewal the renewed nonce is also returned in the Set-Cookie header
+            and must be sent back to the verify pin endpoint; a silent renewal
+            (no session) sets no cookie.
           headers:
             Set-Cookie:
               description: >-
@@ -350,6 +352,17 @@ paths:
               schema:
                 type: string
               example: "__Host-oc_guest_nonce_<share-hash>=<value>"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/guestLinkRenewResponse'
+              examples:
+                with pin:
+                  value:
+                    withPin: true
+                without pin:
+                  value:
+                    withPin: false
         '400':
           description: The request body is malformed or a required field is missing.
           content:
@@ -5236,6 +5249,20 @@ components:
         permissionId:
           type: string
           description: Identifier of the share (permission) the guest was invited to.
+    guestLinkRenewResponse:
+      description: >-
+        Response body of a successful guest link renewal. `withPin` is true
+        exactly when the renewal email contains a PIN, which is the case when a
+        valid guest session authorized the renewal. It is false otherwise, which
+        also covers the case where nothing was sent because the newest link can
+        still be redeemed.
+      type: object
+      required:
+        - withPin
+      properties:
+        withPin:
+          type: boolean
+          description: Whether the renewal email contains a PIN.
     guestLinkVerifyPinRequest:
       description: Request body for verifying a guest link PIN.
       type: object
