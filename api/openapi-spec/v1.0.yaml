@@ -6035,6 +6035,7 @@ components:
             enum:
               - user
               - group
+              - guest
               - link
               - remote
           readOnly: true
