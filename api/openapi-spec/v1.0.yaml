@@ -610,6 +610,29 @@ paths:
                     permissionId: ''
         default:
           $ref: '#/components/responses/error'
+  '/v1beta1/extensions/org.libregraph/guestLinks/logout':
+    post:
+      tags:
+        - guestLinks
+      summary: Log out of a guest session
+      description: >-
+        End the guest session in this browser by clearing the guest session
+        cookie. The session token itself stays valid until it expires. The
+        request succeeds without a session cookie as well.
+      operationId: LogoutGuestLink
+      responses:
+        '204':
+          description: >-
+            Success. The guest session cookie is cleared via the Set-Cookie
+            header.
+          headers:
+            Set-Cookie:
+              description: Clears the guest session cookie `__Host-oc_guest_session`.
+              schema:
+                type: string
+              example: "__Host-oc_guest_session="
+        default:
+          $ref: '#/components/responses/error'
   '/v1beta1/me/drives':
     # $ref is buggy in the openapi-generator v7.0.1
     # $ref: '#/paths/~1v1.0~1me~1drives'
