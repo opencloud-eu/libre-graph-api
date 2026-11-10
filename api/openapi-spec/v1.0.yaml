@@ -6636,6 +6636,9 @@ components:
           type: string
           description: URL that displays the resource in the browser. Read-only.
           title: shared
+        spaceId:
+          type: string
+          description: Unique identifier of the drive that contains the item, in the same format as the id of a drive. Read-only.
     quota:
       type: object
       description: Optional. Information about the drive's storage space quota. Read-only.
